@@ -1,8 +1,11 @@
+import os
 import logging
+import logging.config
 import json
 from statistics import mean
 from datetime import timedelta
 from collections import defaultdict
+from multiprocessing import Pool
 
 import numpy as np
 import pandas as pd
@@ -15,18 +18,35 @@ from sklearn.cluster import DBSCAN
 
 MUTATION_NUM_FILE = "Output/mutation_num.json"
 BACKGROUND_NUM_FILE = "Output/background_num.json"
-MUTATION_PER_SEQ_FILE = "Output/mutation_per_seq.json"
 
-
-TYPED_STRAINS_FILE = "Output/typed_strains.json"
+AREA_FIXED_DAILY_DIR = "Output/Area_fixed_daily"
+FIXATION_PERIOD_FILE = "Output/fixation_period.csv"
 
 AVERAGE_PERIOD = 14
 
-logging.basicConfig(
-    format="[%(asctime)s]: %(message)s",
-    datefmt="%Y-%m-%d %I:%M:%S %p",
-    level=logging.INFO
-)
+logging.config.fileConfig("logging.conf")
+
+if not os.path.exists(AREA_FIXED_DAILY_DIR):
+    os.mkdir(AREA_FIXED_DAILY_DIR)
+
+def get_mut_percentage(c_date, AVERAGE_PERIOD, area, bg_num, mutation_num):
+    logging.info(f"{area} {c_date}")
+    
+    date_span = pd.date_range(
+        end=c_date,
+        periods=AVERAGE_PERIOD
+    ).strftime("%Y-%m-%d")
+    
+    daily_average = mean(bg_num.get(d, 0) for d in date_span)
+    if daily_average > 20:
+        return {"Date": c_date, **{mut: mean(mut_info[area].get(d, 0)
+                                             for d in date_span) / daily_average
+                                   for mut, mut_info in mutation_num.items()
+                                   if area in mut_info}}
+    else:
+        return None
+    
+logging.info("Load data...")
 
 with open(MUTATION_NUM_FILE) as f:
     mutation_num = json.load(f)
@@ -34,42 +54,72 @@ with open(MUTATION_NUM_FILE) as f:
 with open(BACKGROUND_NUM_FILE) as f:
     background_num = json.load(f)
 
-with open(MUTATION_PER_SEQ_FILE) as f:
-    mutation_per_seq = json.load(f)
 
-
-typed_strains = {
-    "dominant": defaultdict(list),
-    "recessive": defaultdict(list)
-}
+area_labels = []
 for area, bg_num in background_num.items():
-    if area != "Australia":
+    
+    # if area not in ("Australia", "Austria"):
+    #     continue
+    
+    bg_num_df = pd.DataFrame.from_records(
+        {"d": d, "n": n}
+        for d, n in bg_num.items()
+    )
+    
+    if not (bg_num_df["n"].median() > 10 and bg_num_df["n"].mean() > 20):
         continue
+    
+    mutation_trend_plot = os.path.join("Plots", f"{area}_mutation_trend.pdf")
+    fixation_label_plot = os.path.join("Plots", f"{area}_fixatoin_label.pdf")
     
     logging.info(f"{area} preparing...")
     
-    area_daily = [
-        {"Date": c_date, **{
-            mut: mean(mut_info[area].get(d.strftime("%Y-%m-%d"), 0)
-                      for d in pd.date_range(end=c_date, periods=AVERAGE_PERIOD)) / daily_average
-            for mut, mut_info in mutation_num.items()
-            if area in mut_info
-        }}
-        for c_date in bg_num
-        if (daily_average := mean(bg_num.get(d.strftime("%Y-%m-%d"), 0)
-                                  for d in pd.date_range(end=c_date, periods=AVERAGE_PERIOD))) > 20
-    ]
-    area_daily = pd.DataFrame.from_records(area_daily, index="Date")
-    area_daily.index = pd.to_datetime(area_daily.index)
-    area_daily = area_daily.sort_index()
+    area_fixed_daily_file = os.path.join(AREA_FIXED_DAILY_DIR,
+                                         f"{area}_{AVERAGE_PERIOD}_days_average.csv")
     
-    area_fixed_daily = area_daily.loc[:, (area_daily > 0.5).sum(axis=0) > 30]
+    if not os.path.exists(area_fixed_daily_file):
+        # area_daily = [
+        #     {"Date": c_date, **{
+        #         mut: mean(mut_info[area].get(d.strftime("%Y-%m-%d"), 0)
+        #                   for d in pd.date_range(
+        #                       end=c_date,
+        #                       periods=AVERAGE_PERIOD
+        #                   )) / daily_average
+        #         for mut, mut_info in mutation_num.items()
+        #         if area in mut_info
+        #     }}
+        #     for c_date in bg_num
+        #     if (daily_average := mean(bg_num.get(d.strftime("%Y-%m-%d"), 0)
+        #                               for d in pd.date_range(
+        #                                   end=c_date,
+        #                                   periods=AVERAGE_PERIOD
+        #                               ))) > 20
+        # ]
+        # area_daily = pd.DataFrame.from_records(area_daily, index="Date")
+        with Pool(os.cpu_count()) as p:
+            area_daily = p.starmap(
+                func=get_mut_percentage,
+                iterable=((c_date, AVERAGE_PERIOD, area, bg_num, mutation_num)
+                          for c_date in bg_num)
+            )
+        area_daily = pd.DataFrame.from_records(filter(None, area_daily), index="Date")
+        area_daily.index = pd.to_datetime(area_daily.index)
+        area_daily = area_daily.sort_index()
+        
+        area_fixed_daily = area_daily.loc[:, (area_daily > 0.5).sum(axis=0) > 30]
+        area_fixed_daily.to_csv(area_fixed_daily_file)
+        del area_daily
+    else:
+        area_fixed_daily = pd.read_csv(area_fixed_daily_file)
+        area_fixed_daily["Date"] = pd.to_datetime(area_fixed_daily["Date"])
+        area_fixed_daily = area_fixed_daily.set_index("Date")
+    
     
     rows = area_fixed_daily.columns.values
     
     x_pos = pd.date_range(
-        start=min(area_daily.index.values),
-        end=max(area_daily.index.values)
+        start=min(area_fixed_daily.index.values),
+        end=max(area_fixed_daily.index.values)
     )
     
     fig, axes = plt.subplots(
@@ -94,7 +144,7 @@ for area, bg_num in background_num.items():
         ax.set_ylabel(mut)
         
         
-    plt.savefig("Plots/test.pdf", bbox_inches="tight")
+    plt.savefig(mutation_trend_plot, bbox_inches="tight")
     plt.close()
 
     
@@ -102,7 +152,7 @@ for area, bg_num in background_num.items():
 
     clustering = DBSCAN(
         eps=0.5,
-        min_samples=2,
+        min_samples=15,
         metric="manhattan"
     ).fit(np.array(area_fixed_daily))
 
@@ -117,29 +167,15 @@ for area, bg_num in background_num.items():
     xlim_l, xlim_r = plt.xlim([x_pos[1], x_pos[-1]])
     plt.tick_params(axis='x', labelrotation=60)
     
-    labels = pd.Series(clustering.labels_, index=area_fixed_daily.index)
-    n_labels = labels.nunique() - 1
-    logging.info(f"{area} has {n_labels} clusters")
+    labels = pd.DataFrame({
+        "Label": clustering.labels_,
+        "Area": area
+    }, index=area_fixed_daily.index)
+    area_labels.append(labels)
     
-    for l, group in labels.groupby(labels):
-        if l >= 0:
-            logging.info(f"{area} {l + 1} / {n_labels}")
-            median_freq = area_fixed_daily.loc[group.index.values].median(axis=0)
-            dominant_mut = pd.Series(median_freq[median_freq > 0.8].index.values)
-            recessive_mut = pd.Series(median_freq[median_freq < 0.2].index.values)
-            
-            dominant_mut_str = ", ".join(i for i in dominant_mut)
-            
-            for c_date in group.index.values:
-                c_date = pd.to_datetime(c_date).strftime("%Y-%m-%d")
-                for ac, mut_names in mutation_per_seq[c_date].get(area, {}).items():
-                    if all(dominant_mut.isin(mut_names)):
-                        typed_strains["dominant"][dominant_mut_str].append(ac)
-                    else:
-                        r_m = recessive_mut[recessive_mut.isin(mut_names)].values
-                        if len(r_m):
-                            r_m = ", ".join(i for i in r_m)
-                            typed_strains["recessive"][r_m].append(ac)
+    n_labels = labels[labels["Label"] != -1]["Label"].nunique()
+    logging.info(f"{area} has {n_labels} clusters")
+
 
     cluster_colors = {
         i: rgb2hex(c[:3])
@@ -147,7 +183,7 @@ for area, bg_num in background_num.items():
     }
     cluster_colors[-1] = None
     
-    all_dates = pd.to_datetime(area_daily.index.values)
+    all_dates = pd.to_datetime(area_fixed_daily.index.values)
     date_cls = []
     
     start_d = all_dates[0]
@@ -166,14 +202,11 @@ for area, bg_num in background_num.items():
         if label_color is not None:
             _ = plt.axvspan(start_d, end_d, alpha=0.3, color=label_color)
     
-    plt.savefig("Plots/test2.pdf", bbox_inches="tight")
+    plt.savefig(fixation_label_plot, bbox_inches="tight")
     plt.close()
 
     logging.info(f"{area} done!")
-    if area == "Australia":
-        break
 
-
-with open(TYPED_STRAINS_FILE, "w") as f:
-    json.dump(typed_strains, f)
-
+area_labels = pd.concat(area_labels)
+area_labels.to_csv(FIXATION_PERIOD_FILE)
+logging.info(f"{FIXATION_PERIOD_FILE} saved")
