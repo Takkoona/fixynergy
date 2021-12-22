@@ -1,6 +1,7 @@
 import os
 import re
 import logging
+import logging.config
 import json
 import datetime
 from collections import defaultdict
@@ -17,18 +18,23 @@ MUTATION_NUM_FILE = "Output/mutation_num.json"
 BACKGROUND_NUM_FILE = "Output/background_num.json"
 
 
-logging.basicConfig(
-    format="[%(asctime)s]: %(message)s",
-    datefmt="%Y-%m-%d %I:%M:%S %p",
-    level=logging.INFO
-)
+logging.config.fileConfig("logging.conf")
 
 logging.info("Load data...")
 
 df = pd.read_csv(SURVEILLANCE_FILE, sep="\t", low_memory=False, index_col=0)
+logging.info(f"{len(df.index)} in raw data")
+
 df = df[df["Collection date"].str.len() == 10]
+logging.info(f"{len(df.index)} has complete date")
+
 df["Collection date"] = pd.to_datetime(df["Collection date"])
 df = df[df["Collection date"] > datetime.datetime(2019, 11, 30)]
+logging.info(f"{len(df.index)} after 2019/11/30")
+
+df = df[df["Host"] == "Human"]
+logging.info(f"{len(df.index)} using human host")
+
 df["Continent"] = df["Location"].str.split(" / ").str[0]
 df["Area"] = df["Location"].str.split(" /").str[1].str.strip()
 
@@ -42,9 +48,9 @@ mutation_names = defaultdict(list)
 for c_date, d_group in df.groupby("Collection date"):
     c_date = c_date.strftime("%Y-%m-%d")
     for area, a_group in d_group.groupby("Area"):
+        logging.info(f"{c_date} {area}")
         seqs_mutations_area = {}
         for ac, mut in a_group["AA Substitutions"].iteritems():
-            logging.info(f"{ac} {c_date} {area} {mut}")
             if not pd.isna(mut) and mut != "":
                 mut = mut[1:-1].split(",")
                 seqs_mutations_area[ac] = mut
