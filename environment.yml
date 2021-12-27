@@ -1,0 +1,10 @@
+name: cov_site_fitness
+dependencies:
+  - pytorch::pytorch
+  - pytorch::torchvision
+  - pytorch::torchaudio
+  - pytorch::cpuonly
+  - biopython
+  - pandas
+  - matplotlib
+
