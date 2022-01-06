@@ -3,6 +3,6 @@ dependencies:
   - pytorch::pytorch
   - pytorch::torchvision
   - pytorch::torchaudio
-  - cudatoolkit=11.3
+  - pytorch::cpuonly
   - pandas
   - matplotlib

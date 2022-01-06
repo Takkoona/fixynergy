@@ -7,20 +7,27 @@ from collections import defaultdict
 import pandas as pd
 
 
+WRITE_OUTPUT = True
+
 SITESMAPPING_FILE = "Data/sitesMapping.csv"
 SURVEILLANCE_FILE = "Data/variant_surveillance.tsv"
 
-MUTATION_PER_SEQ_FILE = "Output/mutation_per_seq.json"
-MUTATION_NAMES_FILE = "Output/mutation_names.json"
+MUTATION_PER_SEQ_FILE = "Output/mutation_per_seq.csv"
 MUTATION_NUM_FILE = "Output/mutation_num.json"
 BACKGROUND_NUM_FILE = "Output/background_num.json"
 
-
-logging.config.fileConfig("logging.conf")
+if WRITE_OUTPUT:
+    logging.config.fileConfig("logging.conf")
 
 logging.info("Load data...")
 
-df = pd.read_csv(SURVEILLANCE_FILE, sep="\t", low_memory=False, index_col=0)
+df: pd.DataFrame = pd.read_csv(
+    SURVEILLANCE_FILE,
+    sep="\t",
+    low_memory=False,
+    index_col=0,
+    nrows=None if WRITE_OUTPUT else 20
+)
 logging.info(f"{len(df.index)} in raw data")
 
 df = df[df["Collection date"].str.len() == 10]
@@ -36,52 +43,62 @@ logging.info(f"{len(df.index)} using human host")
 df["Continent"] = df["Location"].str.split(" / ").str[0]
 df["Area"] = df["Location"].str.split(" /").str[1].str.strip()
 
-# df = df.head(20)
-
 
 logging.info("Get all possible mutations...")
 
-seqs_mutations = defaultdict(dict)
+seqs_mutations = []
 mutation_names = defaultdict(list)
-for c_date, d_group in df.groupby("Collection date"):
-    c_date = c_date.strftime("%Y-%m-%d")
+d: pd.Timestamp
+d_group: pd.DataFrame
+a_group: pd.DataFrame
+for d, d_group in df.groupby("Collection date"):
+    c_date = d.strftime("%Y-%m-%d")
     for area, a_group in d_group.groupby("Area"):
         logging.info(f"{c_date} {area}")
-        seqs_mutations_area = {}
         for ac, mut in a_group["AA Substitutions"].iteritems():
             if not pd.isna(mut) and mut != "":
-                mut = mut[1:-1].split(",")
-                seqs_mutations_area[ac] = mut
-                for m in mut:
-                    mutation_names[m].append(ac)
-        seqs_mutations[c_date][area] = seqs_mutations_area
+                mut = mut[1:-1]
+                if mut:
+                    mut = mut.split(",")
+                else:
+                    mut = ()
+            else:
+                mut = ()
+            for m in mut:
+                mutation_names[m].append(ac)
+                seqs_mutations.append({
+                    "Accession": ac,
+                    "Date": d,
+                    "Mutation": m
+                })
 
-with open(MUTATION_PER_SEQ_FILE, "w") as f:
-    json.dump(seqs_mutations, f)
+
+if WRITE_OUTPUT:
+
+    seqs_mutations: pd.DataFrame = pd.DataFrame.from_records(seqs_mutations)
+    seqs_mutations.to_csv(MUTATION_PER_SEQ_FILE, index=False)
     logging.info(f"{MUTATION_PER_SEQ_FILE} saved!")
-
-
-with open(MUTATION_NAMES_FILE, "w") as f:
-    json.dump(mutation_names, f)
-    logging.info(f"{MUTATION_NAMES_FILE} saved!")
 
 
 logging.info("Summarize percentage sum...")
 
 
 mutation_num = defaultdict(dict)
+ac_info: pd.DataFrame
 for mut, accessions in mutation_names.items():
     logging.info(mut)
     for area, ac_info in df.loc[accessions].groupby("Area"):
+        c_dates: pd.Series = ac_info["Collection date"].dt.strftime("%Y-%m-%d")
         percentage_daily = dict(
-            i for i in ac_info["Collection date"].dt.strftime("%Y-%m-%d").value_counts().iteritems()
+            i for i in c_dates.value_counts().iteritems()
         )
         mutation_num[mut][area] = percentage_daily
 
+if WRITE_OUTPUT:
 
-with open(MUTATION_NUM_FILE, "w") as f:
-    json.dump(mutation_num, f)
-    logging.info(f"{MUTATION_NUM_FILE} saved!")
+    with open(MUTATION_NUM_FILE, "w") as f:
+        json.dump(mutation_num, f)
+        logging.info(f"{MUTATION_NUM_FILE} saved!")
 
 
 logging.info("Calculate daily sampling size...")
@@ -89,6 +106,7 @@ logging.info("Calculate daily sampling size...")
 globalDates = pd.to_datetime(df["Collection date"].unique())
 
 bgNum = defaultdict(dict)
+group: pd.DataFrame
 for continent, group in df.groupby("Area"):
     background = group["Collection date"].value_counts()
     background = background.sort_index()
@@ -100,8 +118,10 @@ for continent, group in df.groupby("Area"):
         else:
             bgNum[continent][d_str] = 0
 
-with open(BACKGROUND_NUM_FILE, "w") as f:
-    json.dump(bgNum, f)
-    logging.info(f"{BACKGROUND_NUM_FILE} saved!")
+if WRITE_OUTPUT:
+
+    with open(BACKGROUND_NUM_FILE, "w") as f:
+        json.dump(bgNum, f)
+        logging.info(f"{BACKGROUND_NUM_FILE} saved!")
 
 logging.info("Done!")

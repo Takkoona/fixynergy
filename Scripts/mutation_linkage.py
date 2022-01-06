@@ -71,8 +71,8 @@ for area, bg_num in background_num.items():
     if not (bg_num_df["n"].median() > 10 and bg_num_df["n"].mean() > 20):
         continue
 
-    mutation_trend_plot = os.path.join("Plots", f"{area}_mutation_trend.pdf")
-    fixation_label_plot = os.path.join("Plots", f"{area}_fixatoin_label.pdf")
+    mutation_trend_plot = os.path.join("Plots", "Area_fixed_daily", f"{area}_mutation_trend.pdf")
+    fixation_label_plot = os.path.join("Plots", "Area_fixed_daily", f"{area}_fixatoin_label.pdf")
 
     logging.info(f"{area} preparing...")
 
