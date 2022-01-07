@@ -11,6 +11,7 @@ WRITE_OUTPUT = True
 
 TRAINING_DATA_FILE = "Output/training_data.csv"
 MUTATION_EMBEDDINGS_FILE = "Output/mutation_embeddings.csv"
+SEQUENCE_EMBEDDINGS_FILE = "Output/sequence_embeddings.csv"
 
 TRAINING_LOSSES_PLOT = "Plots/training_losses.pdf"
 
@@ -54,10 +55,13 @@ class MutationDataset(Dataset):
         self.mut_ids = seq_mut["Mut_id"].unique()
         logging.info(f"{len(self.seq_ids)} seqs and {len(self.mut_ids)} muts")
 
-        self.mut_id2name = self.seq_mut[["Mutation", "Mut_id"]]
-        self.mut_id2name = self.mut_id2name.drop_duplicates()
-        self.mut_id2name = self.mut_id2name.set_index("Mut_id", drop=True)
-        self.mut_id2name = self.mut_id2name["Mutation"].sort_index()
+        self.seq_id2name = self.id2name("Seq_id", "Accession")
+        self.mut_id2name = self.id2name("Mut_id", "Mutation")
+
+        # self.mut_id2name = self.seq_mut[["Mutation", "Mut_id"]]
+        # self.mut_id2name = self.mut_id2name.drop_duplicates()
+        # self.mut_id2name = self.mut_id2name.set_index("Mut_id", drop=True)
+        # self.mut_id2name = self.mut_id2name["Mutation"].sort_index()
 
         self.X = self.seq_mut[["Seq_id", "Mut_id"]].values
         self.y = self.seq_mut["Value"].values
@@ -68,17 +72,23 @@ class MutationDataset(Dataset):
     def __getitem__(self, idx):
         return self.X[idx], self.y[idx]
 
+    def id2name(self, id_col, name_col):
+        res = self.seq_mut[[name_col, id_col]]
+        res = res.drop_duplicates()
+        res = res.set_index(id_col, drop=True)
+        return res[name_col].sort_index()
+
 
 def main(device):
 
     seq_mut = pd.read_csv(TRAINING_DATA_FILE)
     n_combinations = 100
 
-    batch_size = 200
+    batch_size = 128
     shuffle = True
     learning_rate = 1e-3
     weight_decay = 1e-5
-    n_epochs = 100
+    n_epochs = 1000
 
     training_data = MutationDataset(seq_mut)
     training_iter = DataLoader(
@@ -135,6 +145,15 @@ def main(device):
     )
     mut_embbedings.to_csv(MUTATION_EMBEDDINGS_FILE)
     logging.info(f"{MUTATION_EMBEDDINGS_FILE} saved!")
+
+    seq_embbedings = model.seq_embedding.weight.data.cpu().numpy()
+    seq_embbedings = pd.DataFrame(
+        seq_embbedings,
+        columns=[f"comb_{n}" for n in range(n_combinations)],
+        index=training_data.seq_id2name
+    )
+    seq_embbedings.to_csv(SEQUENCE_EMBEDDINGS_FILE)
+    logging.info(f"{SEQUENCE_EMBEDDINGS_FILE} saved!")
 
 
 if __name__ == "__main__":

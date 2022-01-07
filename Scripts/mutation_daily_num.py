@@ -55,7 +55,7 @@ for d, d_group in df.groupby("Collection date"):
     c_date = d.strftime("%Y-%m-%d")
     for area, a_group in d_group.groupby("Area"):
         logging.info(f"{c_date} {area}")
-        for ac, mut in a_group["AA Substitutions"].iteritems():
+        for ac, mut, pango in a_group[["AA Substitutions", "Pango lineage"]].itertuples():
             if not pd.isna(mut) and mut != "":
                 mut = mut[1:-1]
                 if mut:
@@ -69,7 +69,8 @@ for d, d_group in df.groupby("Collection date"):
                 seqs_mutations.append({
                     "Accession": ac,
                     "Date": d,
-                    "Mutation": m
+                    "Mutation": m,
+                    "Lineage": pango
                 })
 
 
