@@ -3,7 +3,9 @@ dependencies:
   - pytorch::pytorch
   - pytorch::torchvision
   - pytorch::torchaudio
-  - conda-forge::umap-learn
   - cudatoolkit=11.3
   - pandas
+  - pyarrow
   - matplotlib
+  - conda-forge::umap-learn
+  - conda-forge::ipykernel

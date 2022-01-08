@@ -12,7 +12,7 @@ WRITE_OUTPUT = True
 SITESMAPPING_FILE = "Data/sitesMapping.csv"
 SURVEILLANCE_FILE = "Data/variant_surveillance.tsv"
 
-MUTATION_PER_SEQ_FILE = "Output/mutation_per_seq.csv"
+MUTATION_PER_SEQ_FILE = "Output/mutation_per_seq.feather"
 MUTATION_NUM_FILE = "Output/mutation_num.json"
 BACKGROUND_NUM_FILE = "Output/background_num.json"
 
@@ -77,7 +77,7 @@ for d, d_group in df.groupby("Collection date"):
 if WRITE_OUTPUT:
 
     seqs_mutations: pd.DataFrame = pd.DataFrame.from_records(seqs_mutations)
-    seqs_mutations.to_csv(MUTATION_PER_SEQ_FILE, index=False)
+    seqs_mutations.to_feather(MUTATION_PER_SEQ_FILE, index=False)
     logging.info(f"{MUTATION_PER_SEQ_FILE} saved!")
 
 

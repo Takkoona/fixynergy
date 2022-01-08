@@ -7,12 +7,10 @@ from torch.utils.data.dataset import Dataset
 from torch.utils.data import DataLoader
 from matplotlib import pyplot as plt
 
-WRITE_OUTPUT = True
 
 TRAINING_DATA_FILE = "Output/training_data.csv"
-MUTATION_EMBEDDINGS_FILE = "Output/mutation_embeddings.csv"
-SEQUENCE_EMBEDDINGS_FILE = "Output/sequence_embeddings.csv"
 
+FIXYNERGY_MODEL = "Output/fixynergy.pth"
 TRAINING_LOSSES_PLOT = "Plots/training_losses.pdf"
 
 logging.config.fileConfig("logging.conf")
@@ -20,16 +18,23 @@ logging.config.fileConfig("logging.conf")
 
 class Fixynergy(torch.nn.Module):
 
-    def __init__(self, n_seqs, n_muts, n_combinations) -> None:
+    def __init__(self, n_seqs, n_muts, n_factors) -> None:
         super().__init__()
-        self.seq_embedding = torch.nn.Embedding(n_seqs, n_combinations)
-        self.mut_embedding = torch.nn.Embedding(n_muts, n_combinations)
 
-        self.seq_embedding.weight.data.uniform_(0, 0.05)
-        self.mut_embedding.weight.data.uniform_(0, 0.05)
+        self.n_seqs = n_seqs
+        self.n_muts = n_muts
+        self.n_factors = n_factors
 
-        n_conn = n_combinations * 2
+        self.seq_embedding = torch.nn.Embedding(n_seqs, n_factors)
+        self.mut_embedding = torch.nn.Embedding(n_muts, n_factors)
+
+        self.seq_embedding.weight.data.uniform_(0, 0.01)
+        self.mut_embedding.weight.data.uniform_(0, 0.01)
+
+        n_conn = n_factors * 2
         self.hidden = torch.nn.Sequential(
+            torch.nn.Linear(n_conn, n_conn),
+            torch.nn.ReLU(),
             torch.nn.Linear(n_conn, n_conn),
             torch.nn.ReLU(),
             torch.nn.Linear(n_conn, 1),
@@ -58,11 +63,6 @@ class MutationDataset(Dataset):
         self.seq_id2name = self.id2name("Seq_id", "Accession")
         self.mut_id2name = self.id2name("Mut_id", "Mutation")
 
-        # self.mut_id2name = self.seq_mut[["Mutation", "Mut_id"]]
-        # self.mut_id2name = self.mut_id2name.drop_duplicates()
-        # self.mut_id2name = self.mut_id2name.set_index("Mut_id", drop=True)
-        # self.mut_id2name = self.mut_id2name["Mutation"].sort_index()
-
         self.X = self.seq_mut[["Seq_id", "Mut_id"]].values
         self.y = self.seq_mut["Value"].values
 
@@ -82,13 +82,13 @@ class MutationDataset(Dataset):
 def main(device):
 
     seq_mut = pd.read_csv(TRAINING_DATA_FILE)
-    n_combinations = 100
+    n_factors = 10
 
     batch_size = 128
     shuffle = True
     learning_rate = 1e-3
     weight_decay = 1e-5
-    n_epochs = 1000
+    n_epochs = 100
 
     training_data = MutationDataset(seq_mut)
     training_iter = DataLoader(
@@ -97,11 +97,13 @@ def main(device):
         shuffle=shuffle
     )
 
-    model = Fixynergy(
-        n_seqs=len(training_data.seq_ids),
-        n_muts=len(training_data.mut_ids),
-        n_combinations=n_combinations
-    )
+    model_args = {
+        "n_seqs": len(training_data.seq_ids),
+        "n_muts": len(training_data.mut_ids),
+        "n_factors": n_factors
+    }
+
+    model = Fixynergy(**model_args)
     model.to(device)
     loss_fn = torch.nn.MSELoss(reduction="sum")
     optimizer = torch.optim.Adam(
@@ -132,31 +134,20 @@ def main(device):
         })
 
     losses = pd.DataFrame.from_records(losses, index="epoch")
-    losses = losses[losses.index > n_epochs * 0.01]
+    losses = losses[losses.index > n_epochs * 0.2]
     plt.plot(losses["loss"])
     plt.savefig(TRAINING_LOSSES_PLOT)
     logging.info(f"{TRAINING_LOSSES_PLOT} saved!")
 
-    mut_embbedings = model.mut_embedding.weight.data.cpu().numpy()
-    mut_embbedings = pd.DataFrame(
-        mut_embbedings,
-        columns=[f"comb_{n}" for n in range(n_combinations)],
-        index=training_data.mut_id2name
-    )
-    mut_embbedings.to_csv(MUTATION_EMBEDDINGS_FILE)
-    logging.info(f"{MUTATION_EMBEDDINGS_FILE} saved!")
-
-    seq_embbedings = model.seq_embedding.weight.data.cpu().numpy()
-    seq_embbedings = pd.DataFrame(
-        seq_embbedings,
-        columns=[f"comb_{n}" for n in range(n_combinations)],
-        index=training_data.seq_id2name
-    )
-    seq_embbedings.to_csv(SEQUENCE_EMBEDDINGS_FILE)
-    logging.info(f"{SEQUENCE_EMBEDDINGS_FILE} saved!")
+    torch.save({
+        "model_args": model_args,
+        "model_state_dict": model.state_dict()
+    }, FIXYNERGY_MODEL)
+    logging.info(f"{FIXYNERGY_MODEL} saved!")
 
 
 if __name__ == "__main__":
     use_cuda = torch.cuda.is_available()
+    # use_cuda = False
     device = torch.device("cuda:0" if use_cuda else "cpu")
     main(device)
