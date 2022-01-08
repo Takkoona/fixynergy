@@ -1,8 +1,0 @@
-name: fixynergy
-dependencies:
-  - pytorch::pytorch
-  - pytorch::torchvision
-  - pytorch::torchaudio
-  - pytorch::cpuonly
-  - pandas
-  - matplotlib
