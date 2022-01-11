@@ -9,3 +9,4 @@ dependencies:
   - matplotlib
   - conda-forge::umap-learn
   - conda-forge::ipykernel
+  - conda-forge::nbconvert
