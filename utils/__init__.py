@@ -25,15 +25,14 @@ AREA_FIXED_DAILY_DIR = os.path.join(OUTPUT_DIR, "area_fixed_daily")
 FIXATION_LINKAGE_FILE = os.path.join(OUTPUT_DIR, "fixation_linkage.csv")
 
 TRAINING_DATA_FILE = os.path.join(OUTPUT_DIR, "training_data.feather")
+DUMMY_SEQ_NAMES_FILE = os.path.join(OUTPUT_DIR, "dummy_seq_names.json")
 
-EMBEDDINGS_SEQ_FILE = os.path.join(OUTPUT_DIR, "embeddings_seq.csv")
-EMBEDDINGS_MUT_FILE = os.path.join(OUTPUT_DIR, "embeddings_mut.csv")
 MUTATION_SCORES_FILE = os.path.join(OUTPUT_DIR, "mutation_scores.feather")
 TRAINING_LOSSES_PLOT = os.path.join(PLOTS_DIR, "training_losses.pdf")
 
 logging.basicConfig(
     filename=LOG_FILE,
-    format="[%(asctime)s %(filename)s]: %(message)s",
+    format="[%(asctime)s %(process)s]: %(message)s",
     datefmt="%Y-%m-%d %I:%M:%S %p",
     level=logging.INFO
 )
