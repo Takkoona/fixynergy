@@ -1,5 +1,3 @@
-import logging
-
 import numpy as np
 import pandas as pd
 import torch
@@ -18,8 +16,8 @@ class Fixynergy(torch.nn.Module):
         self.seq_embedding = torch.nn.Embedding(n_seq, n_factors)
         self.mut_embedding = torch.nn.Embedding(n_pos, n_factors)
 
-        self.seq_embedding.weight.data.uniform_(0, 0.01)
-        self.mut_embedding.weight.data.uniform_(0, 0.01)
+        self.seq_embedding.weight.data.uniform_(-0.01, 0.01)
+        self.mut_embedding.weight.data.uniform_(-0.01, 0.01)
 
         n_conn = n_factors * 2
         self.hidden = torch.nn.Sequential(
@@ -48,11 +46,21 @@ class MutationDataset(Dataset):
 
         self.n_seq = len(self.seq_id2name.values)
         self.n_pos = len(self.pos_id2name.values)
-        logging.info(f"{self.n_seq} seqs and {self.n_pos} pos")
 
         self.n_states = seq_mut["AA_idx"].nunique()
         self.one_hot = np.eye(self.n_states)
-        self.data = self.seq_mut[["Seq_id", "Pos_id", "AA_idx"]].values
+        self.data_col = ["Seq_id", "Pos_id", "AA_idx"]
+        self.data = self.seq_mut[self.data_col].values
+
+        self.label_balance = {}
+        pos_group: pd.DataFrame
+        for _, pos_group in seq_mut.groupby("Pos"):
+            aa_summary = pos_group["AA"].value_counts()
+            for aa, num in (aa_summary - np.min(aa_summary)).items():
+                self.label_balance[tuple(
+                    pos_group.index[pos_group["AA"] == aa])] = num
+
+        self.mask = np.ones(len(self.seq_mut), dtype=bool)
 
     def __len__(self):
         return len(self.data)
@@ -66,3 +74,31 @@ class MutationDataset(Dataset):
         res = res.drop_duplicates()
         res = res.set_index(id_col, drop=True)
         return res[name_col].sort_index()
+
+    def balance_values(self):
+        for index, size in self.label_balance.items():
+            drop_index = np.random.choice(
+                index,
+                size=size,
+                replace=False,
+            )
+            self.mask[drop_index] = False
+        self.data = self.seq_mut[self.data_col].values[self.mask]
+        self.mask[drop_index] = True
+
+    def fill_underrepresented(self):
+        times_to_multiply = {}
+
+        pos_group: pd.DataFrame
+        for _, pos_group in self.seq_mut.groupby("Pos"):
+            aa_summary = pos_group["AA"].value_counts()
+            for aa, num in (np.max(aa_summary) / aa_summary).items():
+                if num > 1:
+                    times_to_multiply[tuple(
+                        pos_group.index[pos_group["AA"] == aa])] = np.floor(num)
+
+        self.data = self.seq_mut[self.data_col].values
+        for index, num in times_to_multiply.items():
+            for i in index:
+                to_fill = np.tile(self.data[i], (np.int64(num), 1))
+                self.data = np.vstack([self.data, to_fill])
