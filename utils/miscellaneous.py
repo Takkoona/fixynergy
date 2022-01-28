@@ -1,3 +1,4 @@
+from concurrent.futures import thread
 import numpy as np
 import pandas as pd
 
@@ -51,17 +52,34 @@ def aa_per_seq(ac: str, ac_group: pd.DataFrame, pos_info: pd.DataFrame, all_mut_
     }
 
 
-def calculate_pred_AA(
+def extract_AA(
     ac: str,
     ac_group: pd.DataFrame,
     aa_table: pd.Series,
-    true_AA: pd.DataFrame
 ):
     return pd.DataFrame.from_records([
-        {
-            "Accession": ac,
-            "Pos": row["Pos"],
-            "AA": true_AA.loc[row["Pos"], "AA"] in (row[aa_table.values][row[aa_table.values] > 0]).index
-        }
+        _best_scored_AA(ac, row["Pos"], row[aa_table.values])
         for _, row in ac_group.iterrows()
     ])
+
+
+def _best_scored_AA(ac: str, pos: int, row_aa: pd.Series):
+    best_scored_index = np.argmax(row_aa)
+    return {
+        "Accession": ac,
+        "Pos": pos,
+        "AA": row_aa.index[best_scored_index],
+        "Score": row_aa.values[best_scored_index]
+    }
+
+
+def select_mut_AA(
+    dummy: str,
+    dummy_group: pd.DataFrame,
+    aa_table: pd.Series,
+    muts: list,
+):
+    aa_df = extract_AA(dummy, dummy_group, aa_table)
+    aa_info = aa_df["Pos"].astype(str) + aa_df["AA"]
+    aa_info = aa_info[aa_info.isin(muts)]
+    return aa_df

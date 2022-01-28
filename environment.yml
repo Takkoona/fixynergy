@@ -10,3 +10,4 @@ dependencies:
   - conda-forge::umap-learn
   - conda-forge::ipykernel
   - conda-forge::nbconvert
+  - conda-forge::matplotlib-venn

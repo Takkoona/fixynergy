@@ -102,3 +102,33 @@ class MutationDataset(Dataset):
             for i in index:
                 to_fill = np.tile(self.data[i], (np.int64(num), 1))
                 self.data = np.vstack([self.data, to_fill])
+
+
+class MutationRecommender(torch.nn.Module):
+
+    def __init__(self, n_seq, n_pos, n_factors, n_states) -> None:
+        super().__init__()
+
+        self.n_seq = n_seq
+        self.n_pos = n_pos
+        self.n_factors = n_factors
+        self.n_states = n_states
+
+        self.seq_embedding = torch.nn.Embedding(n_seq, n_factors)
+        self.aa_embeddings = torch.nn.ModuleList([
+            torch.nn.Embedding(n_pos, n_factors)
+            for _ in range(n_states)
+        ])
+
+        self.seq_embedding.weight.data.uniform_(-0.01, 0.01)
+        embed: torch.nn.Embedding
+        for embed in self.aa_embeddings:
+            embed.weight.data.uniform_(-0.01, 0.01)
+
+    def forward(self, seq_ids, pos_ids):
+        seq_vec = self.seq_embedding(seq_ids)
+        res = torch.stack([
+            torch.mul(seq_vec, embed(pos_ids)).sum(1)
+            for embed in self.aa_embeddings
+        ], dim=1)
+        return res

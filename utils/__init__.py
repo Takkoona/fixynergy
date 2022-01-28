@@ -30,6 +30,8 @@ DUMMY_SEQ_NAMES_FILE = os.path.join(OUTPUT_DIR, "dummy_seq_names.json")
 MUTATION_SCORES_FILE = os.path.join(OUTPUT_DIR, "mutation_scores.feather")
 TRAINING_LOSSES_PLOT = os.path.join(PLOTS_DIR, "training_losses.pdf")
 
+RECOMMENDED_MUTATIONS_FILE = os.path.join(OUTPUT_DIR, "recommended_mutations.feather")
+
 logging.basicConfig(
     filename=LOG_FILE,
     format="[%(asctime)s %(process)s]: %(message)s",
