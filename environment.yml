@@ -7,7 +7,10 @@ dependencies:
   - pandas
   - pyarrow
   - matplotlib
+  - scipy
+  - statsmodels
   - conda-forge::umap-learn
   - conda-forge::ipykernel
+  - conda-forge::notebook
   - conda-forge::nbconvert
   - conda-forge::matplotlib-venn

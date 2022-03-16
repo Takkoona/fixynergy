@@ -5,6 +5,7 @@ from datetime import datetime
 AVERAGE_PERIOD = 14
 
 TARGET_PROTEIN = "Spike"
+SAMPLE_START_DATE = datetime(2019, 11, 30)
 SAMPLE_END_DATE = datetime(2020, 5, 1)
 MUTATION_SCORE = 1
 MISSING_PENALTY = 0

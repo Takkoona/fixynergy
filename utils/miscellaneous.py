@@ -1,4 +1,3 @@
-from concurrent.futures import thread
 import numpy as np
 import pandas as pd
 
@@ -83,3 +82,20 @@ def select_mut_AA(
     aa_info = aa_df["Pos"].astype(str) + aa_df["AA"]
     aa_info = aa_info[aa_info.isin(muts)]
     return aa_df
+
+
+def remove_same_site_combo(all_mut_combo) -> set:
+    all_possible_mut_combo = []
+    for combo in all_mut_combo:
+        prev_site = -1
+        to_keep = True
+        for mut in combo:
+            site = int("".join(filter(str.isdigit, mut)))
+            if site == prev_site:
+                to_keep = False
+                break
+            prev_site = site
+        if to_keep:
+            all_possible_mut_combo.append(combo)
+
+    return set(all_possible_mut_combo)
