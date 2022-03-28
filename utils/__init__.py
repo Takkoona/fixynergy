@@ -9,6 +9,7 @@ SAMPLE_START_DATE = datetime(2019, 11, 30)
 SAMPLE_END_DATE = datetime(2020, 5, 1)
 MUTATION_SCORE = 1
 MISSING_PENALTY = 0
+COMBO_MIN_NUM = 2
 
 DATA_DIR = "data"
 OUTPUT_DIR = "output"
@@ -32,6 +33,12 @@ MUTATION_SCORES_FILE = os.path.join(OUTPUT_DIR, "mutation_scores.feather")
 TRAINING_LOSSES_PLOT = os.path.join(PLOTS_DIR, "training_losses.pdf")
 
 RECOMMENDED_MUTATIONS_FILE = os.path.join(OUTPUT_DIR, "recommended_mutations.feather")
+
+FUTURE_COMBO_MISSED_FILE = os.path.join(OUTPUT_DIR, "future_combo_missed.feather")
+FUTURE_COMBO_MISSED_ID_FILE = os.path.join(OUTPUT_DIR, "future_combo_missed_id.pickle")
+
+FUTURE_COMBO_CAPTURED_FILE = os.path.join(OUTPUT_DIR, "future_combo_captured.feather")
+FUTURE_COMBO_CAPTURED_ID_FILE = os.path.join(OUTPUT_DIR, "future_combo_captured_id.pickle")
 
 logging.basicConfig(
     filename=LOG_FILE,
