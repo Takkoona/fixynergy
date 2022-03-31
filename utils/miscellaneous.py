@@ -1,7 +1,7 @@
-import pickle
-
 import numpy as np
 import pandas as pd
+
+# from utils import logging
 
 
 def get_mut_percentage(c_date, AVERAGE_PERIOD, area, bg_num: dict, mutation_num: dict):
@@ -103,48 +103,23 @@ def remove_same_site_combo(all_mut_combo) -> set:
     return set(all_possible_mut_combo)
 
 
-def combo_daily_count(
-    all_mut_combo: set,
-    future_possible_combo_id: dict,
-    future_combo_dated: dict,
-    combo_file: str,
-    id_file: str
-):
-    res = []
-    id2combo = {}
-    for combo in all_mut_combo:
-        combo_id = future_possible_combo_id[combo]
-        id2combo[combo_id] = tuple(combo)
-        for c_date, c_date_combo in future_combo_dated.items():
-            combo_freq = c_date_combo[combo]
-            if combo_freq:
-                res.append({
-                    "Combo_id": combo_id,
-                    "Date": c_date,
-                    "Combo_count": combo_freq,
-                })
-
-    res = pd.DataFrame.from_dict(res)
-    res.to_feather(combo_file)
-    with open(id_file, "wb") as f:
-        pickle.dump(id2combo, f)
-
-
 def area_combo_count(
     combo_per_ac: list,
-    captured_combo: list,
-    missed_combo: list,
+    sampled_captured: list,
+    sampled_missed: list,
     c_date,
     area,
+    nth_comparison
 ):
+    # logging.info(f"{nth_comparison} {c_date} {area}")
     ac_captured = 0
     ac_missed = 0
     for ac_combos in combo_per_ac:
         n_captured = 0
         n_missed = 0
         for combo in ac_combos:
-            n_captured += combo in captured_combo
-            n_missed += combo in missed_combo
+            n_captured += frozenset(combo) in sampled_captured
+            n_missed += frozenset(combo) in sampled_missed
         ac_captured += bool(n_captured)
         ac_missed += bool(n_missed)
     return {
@@ -152,5 +127,6 @@ def area_combo_count(
         "Date": c_date,
         "AC_captured": ac_captured,
         "AC_missed": ac_missed,
-        "AC_total": len(combo_per_ac)
+        "AC_total": len(combo_per_ac),
+        "nth_comparison": nth_comparison
     }

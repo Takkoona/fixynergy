@@ -34,11 +34,10 @@ TRAINING_LOSSES_PLOT = os.path.join(PLOTS_DIR, "training_losses.pdf")
 
 RECOMMENDED_MUTATIONS_FILE = os.path.join(OUTPUT_DIR, "recommended_mutations.feather")
 
-FUTURE_COMBO_MISSED_FILE = os.path.join(OUTPUT_DIR, "future_combo_missed.feather")
-FUTURE_COMBO_MISSED_ID_FILE = os.path.join(OUTPUT_DIR, "future_combo_missed_id.pickle")
+FUTURE_COMBO_MISSED_FILE = os.path.join(OUTPUT_DIR, "future_combo_missed.pickle")
+FUTURE_COMBO_CAPTURED_FILE = os.path.join(OUTPUT_DIR, "future_combo_captured.pickle")
 
-FUTURE_COMBO_CAPTURED_FILE = os.path.join(OUTPUT_DIR, "future_combo_captured.feather")
-FUTURE_COMBO_CAPTURED_ID_FILE = os.path.join(OUTPUT_DIR, "future_combo_captured_id.pickle")
+CAPTURE_MISSED_AREA_COUNT_FILE = os.path.join(OUTPUT_DIR, "capture_missed_area_count.csv")
 
 logging.basicConfig(
     filename=LOG_FILE,
