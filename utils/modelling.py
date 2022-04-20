@@ -41,8 +41,8 @@ class MutationDataset(Dataset):
         super().__init__()
         self.seq_mut = seq_mut
 
-        self.seq_id2name = self.id2name("Seq_id", "Accession")
-        self.pos_id2name = self.id2name("Pos_id", "Pos")
+        self.seq_id2name = self.id2name("Seq_id", "Accession", "Protein")
+        self.pos_id2name = self.id2name("Pos_id", "Pos", "Protein")
 
         self.n_seq = len(self.seq_id2name.values)
         self.n_pos = len(self.pos_id2name.values)
@@ -69,11 +69,11 @@ class MutationDataset(Dataset):
         seq, mut, value = self.data[idx, :]
         return (seq, mut), self.one_hot[:, value]
 
-    def id2name(self, id_col, name_col):
-        res = self.seq_mut[[name_col, id_col]]
+    def id2name(self, id_col, name_col, protein_col):
+        res = self.seq_mut[[name_col, id_col, protein_col]]
         res = res.drop_duplicates()
         res = res.set_index(id_col, drop=True)
-        return res[name_col].sort_index()
+        return res[[name_col, protein_col]].sort_index()
 
     def balance_values(self):
         for index, size in self.label_balance.items():
