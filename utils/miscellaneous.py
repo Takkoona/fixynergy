@@ -48,64 +48,39 @@ def _best_scored_AA(ac: str, pos: int, protein: str, row_aa: pd.Series):
         "Accession": ac,
         "Protein": protein,
         "Pos": pos,
-        "AA": row_aa.index[best_scored_index],
+        "AA_state": row_aa.index[best_scored_index],
         "Score": row_aa.values[best_scored_index]
     }
 
 
-def select_mut_AA(
-    dummy: str,
-    dummy_group: pd.DataFrame,
-    aa_table: pd.Series,
-    muts: list,
+def sort_mut_by_pos(
+    df: pd.DataFrame,
+    ref_mut_col: str,
+    mut_col: str,
 ):
-    aa_df = extract_AA(dummy, dummy_group, aa_table)
-    aa_info = aa_df["Pos"].astype(str) + aa_df["AA"]
-    aa_info = aa_info[aa_info.isin(muts)]
-    return aa_df
+    df, ref_protein_col, ref_pos_col = _separate_protein_pos(df, ref_mut_col)
+    df, protein_col, pos_col = _separate_protein_pos(df, mut_col)
+
+    df["Ref_pos_greater"] = ((df[ref_protein_col] == df[protein_col]) &
+                             (df[ref_pos_col] > df[pos_col]))
+
+    df[ref_mut_col], df[mut_col] = np.where(
+        df["Ref_pos_greater"],
+        [df[mut_col], df[ref_mut_col]],
+        [df[ref_mut_col], df[mut_col]],
+    )
+    del df[ref_protein_col], df[ref_pos_col], df[protein_col], df[pos_col], df["Ref_pos_greater"]
+    return df
 
 
-def remove_same_site_combo(all_mut_combo) -> set:
-    all_possible_mut_combo = []
-    for combo in all_mut_combo:
-        prev_site = -1
-        to_keep = True
-        for mut in combo:
-            site = int("".join(filter(str.isdigit, mut)))
-            if site == prev_site:
-                to_keep = False
-                break
-            prev_site = site
-        if to_keep:
-            all_possible_mut_combo.append(combo)
-
-    return set(all_possible_mut_combo)
-
-
-def area_combo_count(
-    combo_per_ac: list,
-    sampled_captured: list,
-    sampled_missed: list,
-    c_date,
-    area,
-    nth_comparison
+def _separate_protein_pos(
+    df: pd.DataFrame,
+    mut_col: str,
 ):
-    # logging.info(f"{nth_comparison} {c_date} {area}")
-    ac_captured = 0
-    ac_missed = 0
-    for ac_combos in combo_per_ac:
-        n_captured = 0
-        n_missed = 0
-        for combo in ac_combos:
-            n_captured += frozenset(combo) in sampled_captured
-            n_missed += frozenset(combo) in sampled_missed
-        ac_captured += bool(n_captured)
-        ac_missed += bool(n_missed)
-    return {
-        "Area": area,
-        "Date": c_date,
-        "AC_captured": ac_captured,
-        "AC_missed": ac_missed,
-        "AC_total": len(combo_per_ac),
-        "nth_comparison": nth_comparison
-    }
+    protein_col = mut_col + "_protein"
+    pos_col = mut_col + "_pos"
+
+    name_split = df[mut_col].str.split("_").str
+    df[protein_col] = name_split[0]
+    df[pos_col] = name_split[1].str.extract(r"(\d+)").astype(int)
+    return df, protein_col, pos_col

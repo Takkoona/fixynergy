@@ -1,6 +1,7 @@
 import os
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+
 
 DATA_DIR = "data"
 OUTPUT_DIR = "output"
@@ -33,7 +34,7 @@ if not os.path.exists(TARGET_PROTEIN_PLOT_DIR):
     os.mkdir(TARGET_PROTEIN_PLOT_DIR)
 
 # For target data
-TARGET_AREA = "USA"
+TARGET_AREA = "United Kingdom"
 
 TARGET_DATA_DIR = os.path.join(TARGET_PROTEIN_DIR, TARGET_AREA)
 TARGET_DATA_PLOT_DIR = os.path.join(TARGET_PROTEIN_PLOT_DIR, TARGET_AREA)
@@ -60,21 +61,32 @@ ALL_MUT_SETS_FILE = os.path.join(TARGET_DATA_DIR, "all_mut_sets.csv")
 ALL_AA_COMBO_FILE = os.path.join(TARGET_DATA_DIR, "all_aa_combo.csv")
 
 # For training
-SAMPLE_START_DATE = datetime(2019, 11, 30)
+SAMPLE_TIME_SPAN = 4
 SAMPLE_END_DATE = datetime(2020, 5, 1)
+SAMPLE_START_DATE = SAMPLE_END_DATE - timedelta(days=SAMPLE_TIME_SPAN*30)
 
-TRAINING_DATA_FILE = os.path.join(TARGET_DATA_DIR, "training_data.feather")
-DUMMY_SEQ_NAMES_FILE = os.path.join(TARGET_DATA_DIR, "dummy_seq_names.json")
-MUTATION_SCORES_FILE = os.path.join(TARGET_DATA_DIR, "mutation_scores.feather")
+SAMPLE_DATE_STR = SAMPLE_START_DATE.strftime("%Y%m%d") + "_" + SAMPLE_END_DATE.strftime("%Y%m%d")
+TARGET_DATA_SAMPLED_DIR = os.path.join(TARGET_DATA_DIR, SAMPLE_DATE_STR)
+TARGET_DATA_SAMPLED_PLOT_DIR = os.path.join(TARGET_DATA_PLOT_DIR, SAMPLE_DATE_STR)
 
-TRAINING_LOSSES_PLOT = os.path.join(TARGET_DATA_PLOT_DIR, "training_losses.pdf")
+if not os.path.exists(TARGET_DATA_SAMPLED_DIR):
+    os.mkdir(TARGET_DATA_SAMPLED_DIR)
+
+if not os.path.exists(TARGET_DATA_SAMPLED_PLOT_DIR):
+    os.mkdir(TARGET_DATA_SAMPLED_PLOT_DIR)
+
+TRAINING_DATA_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "training_data.feather")
+DUMMY_SEQ_NAMES_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "dummy_seq_names.json")
+MUTATION_SCORES_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "mutation_scores.feather")
+
+TRAINING_LOSSES_PLOT = os.path.join(TARGET_DATA_SAMPLED_PLOT_DIR, "training_losses.pdf")
 
 # For finding mutation combination
 COMBO_MIN_NUM = 2
 
-RECOMMENDED_MUTATIONS_FILE = os.path.join(TARGET_DATA_DIR, "recommended_mutations.csv")
+RECOMMENDED_MUTATIONS_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "recommended_mutations.csv")
 
-FUTURE_COMBO_FILE = os.path.join(TARGET_DATA_DIR, "future_combo.pickle")
+FUTURE_COMBO_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "future_combo.csv")
 
 # For logging
 logging.basicConfig(
