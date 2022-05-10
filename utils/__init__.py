@@ -34,7 +34,7 @@ if not os.path.exists(TARGET_PROTEIN_PLOT_DIR):
     os.mkdir(TARGET_PROTEIN_PLOT_DIR)
 
 # For target data
-TARGET_AREA = "United Kingdom"
+TARGET_AREA = "USA"
 
 TARGET_DATA_DIR = os.path.join(TARGET_PROTEIN_DIR, TARGET_AREA)
 TARGET_DATA_PLOT_DIR = os.path.join(TARGET_PROTEIN_PLOT_DIR, TARGET_AREA)
@@ -61,9 +61,9 @@ ALL_MUT_SETS_FILE = os.path.join(TARGET_DATA_DIR, "all_mut_sets.csv")
 ALL_AA_COMBO_FILE = os.path.join(TARGET_DATA_DIR, "all_aa_combo.csv")
 
 # For training
-SAMPLE_TIME_SPAN = 4
-SAMPLE_END_DATE = datetime(2020, 5, 1)
-SAMPLE_START_DATE = SAMPLE_END_DATE - timedelta(days=SAMPLE_TIME_SPAN*30)
+SAMPLE_TIME_SPAN = 3
+SAMPLE_END_DATE = datetime(2021, 3, 1)
+SAMPLE_START_DATE = SAMPLE_END_DATE - timedelta(days=SAMPLE_TIME_SPAN)
 
 SAMPLE_DATE_STR = SAMPLE_START_DATE.strftime("%Y%m%d") + "_" + SAMPLE_END_DATE.strftime("%Y%m%d")
 TARGET_DATA_SAMPLED_DIR = os.path.join(TARGET_DATA_DIR, SAMPLE_DATE_STR)
@@ -86,7 +86,11 @@ COMBO_MIN_NUM = 2
 
 RECOMMENDED_MUTATIONS_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "recommended_mutations.csv")
 
+EXISTING_COMBO_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "existing_combo.csv")
 FUTURE_COMBO_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "future_combo.csv")
+
+SCORE_DISTRIBUTION_PLOT = os.path.join(TARGET_DATA_SAMPLED_PLOT_DIR, "score_distribution.pdf")
+SCORE_TREND_PLOT = os.path.join(TARGET_DATA_SAMPLED_PLOT_DIR, "score_trend.pdf")
 
 # For logging
 logging.basicConfig(
