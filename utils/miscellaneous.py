@@ -34,10 +34,10 @@ def aa_per_seq(ac: str, ac_group: pd.DataFrame, pos_info: pd.DataFrame, all_aa_c
 def extract_AA(
     ac: str,
     ac_group: pd.DataFrame,
-    aa_table: pd.Series,
+    aa_names: list,
 ):
     return pd.DataFrame.from_records([
-        _best_scored_AA(ac, row["Pos"], row["Protein"], row[aa_table.values])
+        _best_scored_AA(ac, row["Pos"], row["Protein"], row[aa_names])
         for _, row in ac_group.iterrows()
     ])
 

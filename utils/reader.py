@@ -57,17 +57,18 @@ class AminoAcidComboReader:
         self.all_aa_combo: pd.DataFrame = pd.read_csv(ALL_AA_COMBO_FILE)
         all_mut_sets: pd.DataFrame = pd.read_csv(ALL_MUT_SETS_FILE)
         all_mut_sets["Date"] = pd.to_datetime(all_mut_sets["Date"])
-        self.all_mut_sets = all_mut_sets
+        self.all_mut_sets = all_mut_sets[all_mut_sets["Date"] > SAMPLE_START_DATE]
+
+    def all_data(self):
+        return self._identical_mutation(self.all_mut_sets)
 
     def before_date_data(self):
-        mut_sets = self.all_mut_sets[(self.all_mut_sets["Date"] > SAMPLE_START_DATE) &
-                                     (self.all_mut_sets["Date"] < SAMPLE_END_DATE)]
+        mut_sets = self.all_mut_sets[self.all_mut_sets["Date"] < SAMPLE_END_DATE]
         logging.info(f"{len(mut_sets.index)} sequences before date")
         return self._identical_mutation(mut_sets)
 
     def after_date_data(self):
-        mut_sets = self.all_mut_sets[self.all_mut_sets["Date"]
-                                     >= SAMPLE_END_DATE]
+        mut_sets = self.all_mut_sets[self.all_mut_sets["Date"] >= SAMPLE_END_DATE]
         logging.info(f"{len(mut_sets.index)} sequences after date")
         return self._identical_mutation(mut_sets)
 
