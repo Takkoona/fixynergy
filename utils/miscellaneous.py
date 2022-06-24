@@ -48,7 +48,7 @@ def _best_scored_AA(ac: str, pos: int, protein: str, row_aa: pd.Series):
         "Accession": ac,
         "Protein": protein,
         "Pos": pos,
-        "AA_state": row_aa.index[best_scored_index],
+        "AA": row_aa.index[best_scored_index],
         "Score": row_aa.values[best_scored_index]
     }
 
@@ -60,7 +60,26 @@ def sort_mut_by_pos(
 ):
     df, ref_protein_col, ref_pos_col = _separate_protein_pos(df, ref_mut_col)
     df, protein_col, pos_col = _separate_protein_pos(df, mut_col)
+    return ref_pos_greater(
+        df=df,
+        ref_mut_col=ref_mut_col,
+        ref_protein_col=ref_protein_col,
+        ref_pos_col=ref_pos_col,
+        mut_col=mut_col,
+        protein_col=protein_col,
+        pos_col=pos_col,
+    )
 
+
+def ref_pos_greater(
+    df: pd.DataFrame,
+    ref_mut_col: str,
+    ref_protein_col: str,
+    ref_pos_col: str,
+    mut_col: str,
+    protein_col: str,
+    pos_col: str
+):
     df["Ref_pos_greater"] = ((df[ref_protein_col] == df[protein_col]) &
                              (df[ref_pos_col] > df[pos_col]))
 

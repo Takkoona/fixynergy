@@ -18,6 +18,8 @@ ORIGIN_DATE = datetime(2019, 11, 30)
 MIN_MUT_FREQ = 10
 
 SURVEILLANCE_FILE = os.path.join(DATA_DIR, "variant_surveillance.tsv")
+
+WILD_TYPE_SEQ_FILE = os.path.join(OUTPUT_DIR, "wild_type_seq.csv")
 MUTATION_PER_SEQ_FILE = os.path.join(OUTPUT_DIR, "mutation_per_seq.csv")
 SUS_MUTATION_PER_SEQ_FILE = os.path.join(OUTPUT_DIR, "sus_mutation_per_seq.csv")
 
@@ -34,7 +36,7 @@ if not os.path.exists(TARGET_PROTEIN_PLOT_DIR):
     os.mkdir(TARGET_PROTEIN_PLOT_DIR)
 
 # For target data
-TARGET_AREA = "United Kingdom"
+TARGET_AREA = "USA"
 
 TARGET_DATA_DIR = os.path.join(TARGET_PROTEIN_DIR, TARGET_AREA)
 TARGET_DATA_PLOT_DIR = os.path.join(TARGET_PROTEIN_PLOT_DIR, TARGET_AREA)
@@ -51,6 +53,7 @@ MIN_TOTAL_NUM = 20
 FIXATION_PERCENTAGE = 0.5
 FIXATION_DAYS_THESHOLD = 7
 
+TOTAL_NUM_FILE = os.path.join(TARGET_DATA_DIR, "total_num.csv")
 FIXATION_LINKAGE_FILE = os.path.join(TARGET_DATA_DIR, "fixation_linkage.csv")
 
 MUTATION_TREND_PLOT = os.path.join(TARGET_DATA_PLOT_DIR, "mutation_trend.pdf")
@@ -60,39 +63,9 @@ FIXATION_LABEL_PLOT = os.path.join(TARGET_DATA_PLOT_DIR, "fixatoin_label.pdf")
 ALL_MUT_SETS_FILE = os.path.join(TARGET_DATA_DIR, "all_mut_sets.csv")
 ALL_AA_COMBO_FILE = os.path.join(TARGET_DATA_DIR, "all_aa_combo.csv")
 
-# For finding mutation combination for all dates
-COMBO_MIN_NUM = 2
-
-ALL_DATE_COMBO_FILE = os.path.join(TARGET_DATA_DIR, "all_date_combo.csv")
-
-# For training
-SAMPLE_TIME_SPAN = 3
-SAMPLE_END_DATE = datetime(2021, 3, 1)
-SAMPLE_START_DATE = SAMPLE_END_DATE - timedelta(days=SAMPLE_TIME_SPAN)
-
-SAMPLE_DATE_STR = SAMPLE_START_DATE.strftime("%Y%m%d") + "_" + SAMPLE_END_DATE.strftime("%Y%m%d")
-TARGET_DATA_SAMPLED_DIR = os.path.join(TARGET_DATA_DIR, SAMPLE_DATE_STR)
-TARGET_DATA_SAMPLED_PLOT_DIR = os.path.join(TARGET_DATA_PLOT_DIR, SAMPLE_DATE_STR)
-
-if not os.path.exists(TARGET_DATA_SAMPLED_DIR):
-    os.mkdir(TARGET_DATA_SAMPLED_DIR)
-
-if not os.path.exists(TARGET_DATA_SAMPLED_PLOT_DIR):
-    os.mkdir(TARGET_DATA_SAMPLED_PLOT_DIR)
-
-DUMMY_SEQ_NAMES_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "dummy_seq_names.json")
-MUTATION_SCORES_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "mutation_scores.feather")
-
-TRAINING_LOSSES_PLOT = os.path.join(TARGET_DATA_SAMPLED_PLOT_DIR, "training_losses.pdf")
-
-# For finding mutation combination
-RECOMMENDED_MUTATIONS_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "recommended_mutations.csv")
-
-EXISTING_COMBO_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "existing_combo.csv")
-FUTURE_COMBO_FILE = os.path.join(TARGET_DATA_SAMPLED_DIR, "future_combo.csv")
-
-SCORE_DISTRIBUTION_PLOT = os.path.join(TARGET_DATA_SAMPLED_PLOT_DIR, "score_distribution.pdf")
-SCORE_TREND_PLOT = os.path.join(TARGET_DATA_SAMPLED_PLOT_DIR, "score_trend.pdf")
+# For react rendering
+MUT_NODE_FILE = os.path.join(TARGET_DATA_DIR, "mut_node.json")
+MUT_FREQ_FILE = os.path.join(TARGET_DATA_DIR, "mut_freq.csv")
 
 # For logging
 logging.basicConfig(
