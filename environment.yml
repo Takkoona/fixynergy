@@ -1,15 +1,7 @@
 name: fixynergy
 dependencies:
-  - pytorch::pytorch
-  - pytorch::torchvision
-  - pytorch::torchaudio
-  - cudatoolkit=11.3
   - pandas
-  - pyarrow
   - matplotlib
-  - scipy
-  - statsmodels
   - conda-forge::ipykernel
   - conda-forge::notebook
   - conda-forge::nbconvert
-  - conda-forge::matplotlib-venn

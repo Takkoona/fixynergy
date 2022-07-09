@@ -1,0 +1,27 @@
+{
+  "name": "fixynergy",
+  "version": "1.0.0",
+  "description": "Fitness landscape visualization",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack",
+    "dev": "webpack serve"
+  },
+  "author": "Chengyang Ji",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.18.2",
+    "@babel/preset-env": "^7.18.2",
+    "@babel/preset-react": "^7.17.12",
+    "babel-loader": "^8.2.5",
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.9.3"
+  },
+  "dependencies": {
+    "d3": "^7.4.4",
+    "react": "^18.1.0",
+    "react-dom": "^18.1.0"
+  }
+}

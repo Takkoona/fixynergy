@@ -1,17 +1,17 @@
 import os
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 DATA_DIR = "data"
 OUTPUT_DIR = "output"
-PLOTS_DIR = "plots"
+WEBDATA_DIR = "webdata"
 
 if not os.path.exists(OUTPUT_DIR):
     os.mkdir(OUTPUT_DIR)
 
-if not os.path.exists(PLOTS_DIR):
-    os.mkdir(PLOTS_DIR)
+if not os.path.exists(WEBDATA_DIR):
+    os.mkdir(WEBDATA_DIR)
 
 # For processing raw data
 ORIGIN_DATE = datetime(2019, 11, 30)
@@ -27,25 +27,17 @@ SUS_MUTATION_PER_SEQ_FILE = os.path.join(OUTPUT_DIR, "sus_mutation_per_seq.csv")
 TARGET_PROTEIN = "Spike"
 
 TARGET_PROTEIN_DIR = os.path.join(OUTPUT_DIR, TARGET_PROTEIN)
-TARGET_PROTEIN_PLOT_DIR = os.path.join(PLOTS_DIR, TARGET_PROTEIN)
 
 if not os.path.exists(TARGET_PROTEIN_DIR):
     os.mkdir(TARGET_PROTEIN_DIR)
-
-if not os.path.exists(TARGET_PROTEIN_PLOT_DIR):
-    os.mkdir(TARGET_PROTEIN_PLOT_DIR)
 
 # For target data
 TARGET_AREA = "USA"
 
 TARGET_DATA_DIR = os.path.join(TARGET_PROTEIN_DIR, TARGET_AREA)
-TARGET_DATA_PLOT_DIR = os.path.join(TARGET_PROTEIN_PLOT_DIR, TARGET_AREA)
 
 if not os.path.exists(TARGET_DATA_DIR):
     os.mkdir(TARGET_DATA_DIR)
-
-if not os.path.exists(TARGET_DATA_PLOT_DIR):
-    os.mkdir(TARGET_DATA_PLOT_DIR)
 
 # For found fixation mutation
 AVERAGE_PERIOD = 14
@@ -56,16 +48,13 @@ FIXATION_DAYS_THESHOLD = 7
 TOTAL_NUM_FILE = os.path.join(TARGET_DATA_DIR, "total_num.csv")
 FIXATION_LINKAGE_FILE = os.path.join(TARGET_DATA_DIR, "fixation_linkage.csv")
 
-MUTATION_TREND_PLOT = os.path.join(TARGET_DATA_PLOT_DIR, "mutation_trend.pdf")
-FIXATION_LABEL_PLOT = os.path.join(TARGET_DATA_PLOT_DIR, "fixatoin_label.pdf")
-
 # For all found amino acid combinations
 ALL_MUT_SETS_FILE = os.path.join(TARGET_DATA_DIR, "all_mut_sets.csv")
 ALL_AA_COMBO_FILE = os.path.join(TARGET_DATA_DIR, "all_aa_combo.csv")
 
 # For react rendering
-MUT_NODE_FILE = os.path.join(TARGET_DATA_DIR, "mut_node.json")
-MUT_FREQ_FILE = os.path.join(TARGET_DATA_DIR, "mut_freq.csv")
+MUT_NODE_FILE = os.path.join(WEBDATA_DIR, f"{TARGET_AREA}_mut_node.json")
+MUT_FREQ_FILE = os.path.join(WEBDATA_DIR, f"{TARGET_AREA}_mut_freq.csv")
 
 # For logging
 logging.basicConfig(
