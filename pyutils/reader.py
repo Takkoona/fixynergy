@@ -1,6 +1,6 @@
 import pandas as pd
 
-from utils import (
+from pyutils import (
     logging,
     TARGET_PROTEIN,
     TARGET_AREA,
