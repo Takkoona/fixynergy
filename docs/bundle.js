@@ -2,6 +2,136 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./websrc/dateGraph/Axses.js":
+/*!***********************************!*\
+  !*** ./websrc/dateGraph/Axses.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "AxisBottom": () => (/* binding */ AxisBottom),
+/* harmony export */   "AxisLeft": () => (/* binding */ AxisLeft)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+function AxisBottom(_ref) {
+  var xScale = _ref.xScale,
+      innerHeight = _ref.innerHeight,
+      xAxisTickFormat = _ref.xAxisTickFormat,
+      tickOffset = _ref.tickOffset;
+  return xScale.ticks().map(function (tickValue) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+      key: tickValue,
+      transform: "translate(".concat(xScale(tickValue), ", 0)")
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", {
+      strokeWidth: "1",
+      stroke: "black",
+      opacity: "0.1",
+      y2: innerHeight
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("text", {
+      style: {
+        textAnchor: 'middle'
+      },
+      y: innerHeight + tickOffset
+    }, xAxisTickFormat(tickValue)));
+  });
+}
+function AxisLeft(_ref2) {
+  var yScale = _ref2.yScale,
+      innerWidth = _ref2.innerWidth,
+      tickOffset = _ref2.tickOffset;
+  return yScale.ticks().map(function (tickValue) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+      key: tickValue,
+      transform: "translate(0,".concat(yScale(tickValue), ")")
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", {
+      strokeWidth: "1",
+      stroke: "black",
+      opacity: "0.1",
+      x2: innerWidth
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("text", {
+      style: {
+        textAnchor: 'end'
+      },
+      x: -tickOffset
+    }, tickValue));
+  });
+}
+
+/***/ }),
+
+/***/ "./websrc/dateGraph/Marks.js":
+/*!***********************************!*\
+  !*** ./websrc/dateGraph/Marks.js ***!
+  \***********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DotMarks": () => (/* binding */ DotMarks)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+
+
+function DotMarks(_ref) {
+  var groupedData = _ref.groupedData,
+      xScale = _ref.xScale,
+      xValue = _ref.xValue,
+      xAxisTickFormat = _ref.xAxisTickFormat,
+      yScale = _ref.yScale,
+      yValue = _ref.yValue,
+      colorScale = _ref.colorScale,
+      innerHeigth = _ref.innerHeigth;
+  return Array.from(groupedData).map(function (_ref2) {
+    var _ref3 = _slicedToArray(_ref2, 2),
+        mut = _ref3[0],
+        data = _ref3[1];
+
+    var linePath = (0,d3__WEBPACK_IMPORTED_MODULE_1__.line)().x(function (d) {
+      return xScale(xValue(d));
+    }).y(function (d) {
+      return innerHeigth - yScale(yValue(d));
+    });
+    data = data.sort(function (a, b) {
+      return xValue(a) - xValue(b);
+    });
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+      key: mut
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("path", {
+      key: mut + "line",
+      fill: "none",
+      stroke: colorScale(mut),
+      d: linePath(data)
+    }), data.map(function (d) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
+        key: "".concat(d["mut"]).concat(xAxisTickFormat(xValue(d))),
+        cx: xScale(xValue(d)),
+        cy: innerHeigth - yScale(yValue(d)),
+        r: "2",
+        fill: colorScale(mut)
+      });
+    }));
+  });
+}
+
+/***/ }),
+
 /***/ "./websrc/dateGraph/index.js":
 /*!***********************************!*\
   !*** ./websrc/dateGraph/index.js ***!
@@ -14,15 +144,67 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
+/* harmony import */ var _Axses__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Axses */ "./websrc/dateGraph/Axses.js");
+/* harmony import */ var _Marks__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Marks */ "./websrc/dateGraph/Marks.js");
+
+
+
 
 var margin = {
   top: 20,
-  right: 30,
+  right: 20,
   bottom: 20,
-  left: 30
+  left: 20
 };
-function DateGraph(dailyMutFreq) {
-  return;
+
+var xValue = function xValue(d) {
+  return d["date"];
+};
+
+var xAxisTickFormat = (0,d3__WEBPACK_IMPORTED_MODULE_1__.timeFormat)('%m/%d/%Y');
+var xTickOffset = 20;
+var xAxisLabel = "Collection Date";
+
+var yValue = function yValue(d) {
+  return d["ratio"];
+};
+
+var yTickOffset = 1;
+var yAxisLabel = "Mutation Ratio";
+function DateGraph(_ref) {
+  var dailyMutFreq = _ref.dailyMutFreq,
+      width = _ref.width,
+      height = _ref.height;
+  var innerWidth = width - margin.left - margin.right;
+  var innerHeight = height - margin.top - margin.bottom;
+  var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleTime)().domain((0,d3__WEBPACK_IMPORTED_MODULE_1__.extent)(dailyMutFreq, xValue)).range([0, innerWidth]).nice();
+  var yScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, 1]).range([innerHeight, 0]);
+  var groupedData = (0,d3__WEBPACK_IMPORTED_MODULE_1__.group)(dailyMutFreq, function (d) {
+    return d["mut"];
+  });
+  var colorScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleOrdinal)().domain(groupedData.keys()).range(d3__WEBPACK_IMPORTED_MODULE_1__.schemeSet3);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement((react__WEBPACK_IMPORTED_MODULE_0___default().Fragment), null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+    transform: "translate(".concat(margin.left, ", ").concat(margin.top, ")")
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Marks__WEBPACK_IMPORTED_MODULE_3__.DotMarks, {
+    groupedData: groupedData,
+    xScale: xScale,
+    xValue: xValue,
+    xAxisTickFormat: xAxisTickFormat,
+    yScale: yScale,
+    yValue: yValue,
+    colorScale: colorScale,
+    innerHeigth: innerHeight
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Axses__WEBPACK_IMPORTED_MODULE_2__.AxisBottom, {
+    xScale: xScale,
+    innerHeight: innerHeight,
+    xAxisTickFormat: xAxisTickFormat,
+    tickOffset: xTickOffset
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Axses__WEBPACK_IMPORTED_MODULE_2__.AxisLeft, {
+    yScale: yScale,
+    innerWidth: innerWidth,
+    tickOffset: yTickOffset
+  })));
 }
 
 /***/ }),
@@ -347,6 +529,10 @@ function MutantNode(_ref) {
         x = _mutSetNode$setCoord$2[0],
         y = _mutSetNode$setCoord$2[1];
 
+    if (mutSetNode.ratioSum === 0) {
+      return undefined;
+    }
+
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
       key: mutSetId
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
@@ -354,8 +540,10 @@ function MutantNode(_ref) {
       cx: x,
       cy: y,
       r: nodeSizeScale(mutSetNode.ratioSum),
-      fill: "red",
-      opacity: "0.2"
+      fill: "yellow",
+      opacity: "0.2",
+      stroke: "red",
+      strokeWidth: "2"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, mutSetNode.getMutName())), mutSetNode.parentLinks.map(function (_ref4) {
       var _ref5 = _slicedToArray(_ref4, 2),
           parent = _ref5[0],
@@ -369,9 +557,8 @@ function MutantNode(_ref) {
         x2: x,
         y2: y,
         strokeWidth: "0.5",
-        opacity: (0,d3__WEBPACK_IMPORTED_MODULE_1__.max)([ratioDiff, 0]) // opacity="1"
-        ,
-        stroke: "#000"
+        opacity: (0,d3__WEBPACK_IMPORTED_MODULE_1__.max)([ratioDiff, 0]),
+        stroke: "red"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, "Mutation: ".concat(_utils__WEBPACK_IMPORTED_MODULE_2__.mutationName.apply(void 0, _toConsumableArray(mut)))));
     }));
   });
@@ -398,25 +585,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 var margin = {
-  top: 20,
-  right: 30,
-  bottom: 20,
-  left: 30
+  top: 40,
+  right: 50,
+  bottom: 40,
+  left: 50
 };
 function MutantMap(_ref) {
   var landscapeData = _ref.landscapeData,
       laneLengths = _ref.laneLengths,
       maxRatioSum = _ref.maxRatioSum,
-      landScapeHeight = _ref.landScapeHeight,
-      landScapeWidth = _ref.landScapeWidth;
-  var innerHeight = landScapeHeight - margin.top - margin.bottom;
-  var innerWidth = landScapeWidth - margin.left - margin.right;
+      width = _ref.width,
+      height = _ref.height;
+  var innerWidth = width - margin.left - margin.right;
+  var innerHeight = height - margin.top - margin.bottom;
   var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, laneLengths.length]).range([margin.right, innerWidth]);
   var yScales = laneLengths.map(function (l) {
     return (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, l + 1]).range([innerHeight, margin.bottom]);
   });
   var lineScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, maxRatioSum]).range([0, 30]);
-  var nodeSizeScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleSqrt)().domain([0, maxRatioSum]).range([0, 30]);
+  var nodeSizeScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleSqrt)().domain([0, maxRatioSum]).range([0, 100]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_MutantNode__WEBPACK_IMPORTED_MODULE_2__.MutantNode, {
     landscapeData: landscapeData,
     xScale: xScale,
@@ -67410,10 +67597,16 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 var root = document.getElementById("mutantLandscape");
-var landscapeSizeRatio = 0.8;
-var dateGraphSizeRatio = 1 - landscapeSizeRatio;
-var width = 960;
+var width = 1200;
 var height = 600;
+var landscapeSpecs = {
+  h: 0.7,
+  w: 1
+};
+var dateGraphSpecs = {
+  h: 1 - landscapeSpecs.h,
+  w: 1
+};
 
 var App = function App() {
   var data = (0,_loadData__WEBPACK_IMPORTED_MODULE_2__.LoadData)();
@@ -67429,14 +67622,18 @@ var App = function App() {
     width: width,
     height: height
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_dateGraph__WEBPACK_IMPORTED_MODULE_4__.DateGraph, {
-    dailyMutFreq: dailyMutFreq
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mutantMap__WEBPACK_IMPORTED_MODULE_3__.MutantMap, {
+    dailyMutFreq: dailyMutFreq,
+    width: width * dateGraphSpecs.w,
+    height: height * dateGraphSpecs.h
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+    transform: "translate(0, ".concat(height * dateGraphSpecs.h, ")")
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mutantMap__WEBPACK_IMPORTED_MODULE_3__.MutantMap, {
     landscapeData: landscapeData,
     laneLengths: laneLengths,
     maxRatioSum: maxRatioSum,
-    landScapeHeight: height,
-    landScapeWidth: width
-  }));
+    width: width * landscapeSpecs.w,
+    height: height * landscapeSpecs.h
+  })));
 };
 
 (0,react_dom_client__WEBPACK_IMPORTED_MODULE_1__.createRoot)(root).render( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(App, null));
