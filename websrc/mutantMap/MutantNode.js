@@ -11,6 +11,9 @@ export function MutantNode({
 }) {
     return Array.from(landscapeData).map(([mutSetId, mutSetNode]) => {
         const [x, y] = mutSetNode.setCoord(xScale, yScales).getCoord();
+        if (mutSetNode.ratioSum === 0) {
+            return undefined;
+        }
         return (
             <g key={mutSetId}>
                 <circle
@@ -18,8 +21,10 @@ export function MutantNode({
                     cx={x}
                     cy={y}
                     r={nodeSizeScale(mutSetNode.ratioSum)}
-                    fill="red"
+                    fill="yellow"
                     opacity="0.2"
+                    stroke="red"
+                    strokeWidth="2"
                 >
                     <title>{mutSetNode.getMutName()}</title>
                 </circle>
@@ -34,8 +39,7 @@ export function MutantNode({
                             y2={y}
                             strokeWidth="0.5"
                             opacity={max([ratioDiff, 0])}
-                            // opacity="1"
-                            stroke="#000"
+                            stroke="red"
                         >
                             <title>{`Mutation: ${mutationName(...mut)}`}</title>
                         </line>

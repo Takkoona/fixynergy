@@ -2,18 +2,18 @@ import React from "react";
 import { scaleLinear, scaleSqrt } from "d3";
 import { MutantNode } from "./MutantNode";
 
-const margin = { top: 20, right: 30, bottom: 20, left: 30 }
+const margin = { top: 40, right: 50, bottom: 40, left: 50 }
 
 export function MutantMap({
     landscapeData,
     laneLengths,
     maxRatioSum,
-    landScapeHeight,
-    landScapeWidth
+    width,
+    height
 }) {
 
-    const innerHeight = landScapeHeight - margin.top - margin.bottom;
-    const innerWidth = landScapeWidth - margin.left - margin.right;
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
 
     const xScale = scaleLinear()
         .domain([0, laneLengths.length])
@@ -25,7 +25,7 @@ export function MutantMap({
     });
 
     const lineScale = scaleLinear().domain([0, maxRatioSum]).range([0, 30]);
-    const nodeSizeScale = scaleSqrt().domain([0, maxRatioSum]).range([0, 30]);
+    const nodeSizeScale = scaleSqrt().domain([0, maxRatioSum]).range([0, 100]);
 
     return <MutantNode
         landscapeData={landscapeData}

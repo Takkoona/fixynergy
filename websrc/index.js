@@ -6,11 +6,11 @@ import { DateGraph } from "./dateGraph";
 
 const root = document.getElementById("mutantLandscape");
 
-const landscapeSizeRatio = 0.8;
-const dateGraphSizeRatio = 1 - landscapeSizeRatio;
-
-const width = 960;
+const width = 1200;
 const height = 600;
+
+const landscapeSpecs = { h: 0.7, w: 1 };
+const dateGraphSpecs = { h: 1 - landscapeSpecs.h, w: 1 };
 
 const App = () => {
 
@@ -27,14 +27,18 @@ const App = () => {
         <svg width={width} height={height}>
             <DateGraph
                 dailyMutFreq={dailyMutFreq}
+                width={width * dateGraphSpecs.w}
+                height={height * dateGraphSpecs.h}
             ></DateGraph>
+            <g transform={`translate(0, ${height * dateGraphSpecs.h})`}>
             <MutantMap
                 landscapeData={landscapeData}
                 laneLengths={laneLengths}
                 maxRatioSum={maxRatioSum}
-                landScapeHeight={height}
-                landScapeWidth={width}
+                width={width * landscapeSpecs.w}
+                height={height * landscapeSpecs.h}
             ></MutantMap>
+            </g>
         </svg>
     );
 };
