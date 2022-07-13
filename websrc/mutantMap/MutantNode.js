@@ -4,9 +4,9 @@ import { mutationName } from "../utils";
 
 export function MutantNode({
     landscapeData,
+    mutColorScale,
     xScale,
     yScales,
-    lineScale,
     nodeSizeScale
 }) {
     return Array.from(landscapeData).map(([mutSetId, mutSetNode]) => {
@@ -14,22 +14,20 @@ export function MutantNode({
         if (mutSetNode.ratioSum === 0) {
             return undefined;
         }
+        let minRatioSum = Infinity;
+        let nodeStrokeColor = "grey";
+        let maxIncreMut = null;
         return (
             <g key={mutSetId}>
-                <circle
-                    key={mutSetId.toString() + "node"}
-                    cx={x}
-                    cy={y}
-                    r={nodeSizeScale(mutSetNode.ratioSum)}
-                    fill="yellow"
-                    opacity="0.2"
-                    stroke="red"
-                    strokeWidth="2"
-                >
-                    <title>{mutSetNode.getMutName()}</title>
-                </circle>
                 {mutSetNode.parentLinks.map(([parent, mut]) => {
-                    const ratioDiff = lineScale(mutSetNode.ratioSum) - lineScale(parent.ratioSum);
+                    const mutName = mutationName(...mut);
+                    const currRatioSum = parent.ratioSum;
+                    if (currRatioSum < minRatioSum) {
+                        minRatioSum = currRatioSum;
+                        maxIncreMut = mutName;
+                        nodeStrokeColor = mutColorScale(maxIncreMut);
+                    }
+                    const ratioDiff = mutSetNode.ratioSum - parent.ratioSum;
                     return (
                         <line
                             key={[mutSetId, parent.id].join(",")}
@@ -37,14 +35,27 @@ export function MutantNode({
                             y1={parent.y}
                             x2={x}
                             y2={y}
-                            strokeWidth="0.5"
+                            strokeWidth="1"
                             opacity={max([ratioDiff, 0])}
-                            stroke="red"
+                            // opacity={1}
+                            stroke={mutColorScale(mutName)}
                         >
-                            <title>{`Mutation: ${mutationName(...mut)}`}</title>
+                            <title>{`Mutation: ${mutName}`}</title>
                         </line>
                     );
                 })}
+                <circle
+                    key={mutSetId.toString() + "node"}
+                    cx={x}
+                    cy={y}
+                    r={nodeSizeScale(mutSetNode.ratioSum)}
+                    fill={nodeStrokeColor}
+                    fillOpacity="0.5"
+                    stroke={nodeStrokeColor}
+                    strokeWidth="1"
+                >
+                    <title>{mutSetNode.getMutName()}</title>
+                </circle>
             </g>
         )
     });
