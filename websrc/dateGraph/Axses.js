@@ -12,6 +12,7 @@ export function AxisBottom({ xScale, innerHeight, xAxisTickFormat, tickOffset })
             <text
                 style={{ textAnchor: 'middle' }}
                 y={innerHeight + tickOffset}
+                dy=".71em"
                 fontSize="10"
             >{xAxisTickFormat(tickValue)}</text>
         </g>
@@ -30,6 +31,7 @@ export function AxisLeft({ yScale, innerWidth, tickOffset }) {
             <text
                 style={{ textAnchor: 'end' }}
                 x={-tickOffset}
+                dy=".32em"
                 fontSize="10"
             >{tickValue}</text>
         </g>

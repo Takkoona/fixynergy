@@ -1,5 +1,5 @@
 import React from "react";
-import { max } from "d3";
+import { max, pie, arc } from "d3";
 import { mutationName } from "../utils";
 
 export function MutantNode({
@@ -14,20 +14,16 @@ export function MutantNode({
         if (mutSetNode.ratioSum === 0) {
             return undefined;
         }
-        let minRatioSum = Infinity;
-        let nodeStrokeColor = "grey";
-        let maxIncreMut = null;
+        const mutIncreValues = [];
+        const pieRadius = nodeSizeScale(mutSetNode.ratioSum);
+        const arcScale = arc().innerRadius(0).outerRadius(pieRadius);
+        const pieScale = pie().value(d => d["ratioDiff"]);
         return (
             <g key={mutSetId}>
                 {mutSetNode.parentLinks.map(([parent, mut]) => {
                     const mutName = mutationName(...mut);
-                    const currRatioSum = parent.ratioSum;
-                    if (currRatioSum < minRatioSum) {
-                        minRatioSum = currRatioSum;
-                        maxIncreMut = mutName;
-                        nodeStrokeColor = mutColorScale(maxIncreMut);
-                    }
                     const ratioDiff = mutSetNode.ratioSum - parent.ratioSum;
+                    mutIncreValues.push({ mutName, ratioDiff });
                     return (
                         <line
                             key={[mutSetId, parent.id].join(",")}
@@ -44,19 +40,42 @@ export function MutantNode({
                         </line>
                     );
                 })}
+                <g transform={`translate(${x}, ${y})`}>
+                    {pieScale(mutIncreValues).map(({
+                        data,
+                        startAngle,
+                        endAngle
+                    }) => {
+                        const mutName = data["mutName"];
+                        const pieArcColor = mutColorScale(mutName);
+                        const arcPathGen = arcScale.startAngle(startAngle).endAngle(endAngle);
+                        return (
+                            <path
+                                key={`${mutSetId}${mutName}_pie`}
+                                d={arcPathGen()}
+                                fill={pieArcColor}
+                                fillOpacity="0.5"
+                                stroke={pieArcColor}
+                                strokeWidth="1"
+                            >
+                                <title>{data["mutName"]}</title>
+                            </path>
+                        )
+                    })}
+                    <title>{mutSetNode.getMutName()}</title>
+                </g>
                 <circle
                     key={mutSetId.toString() + "node"}
                     cx={x}
                     cy={y}
-                    r={nodeSizeScale(mutSetNode.ratioSum)}
-                    fill={nodeStrokeColor}
-                    fillOpacity="0.5"
-                    stroke={nodeStrokeColor}
+                    r={pieRadius}
+                    fill="none"
+                    stroke="#d3d3d3"
                     strokeWidth="1"
                 >
                     <title>{mutSetNode.getMutName()}</title>
                 </circle>
             </g>
-        )
+        );
     });
 };

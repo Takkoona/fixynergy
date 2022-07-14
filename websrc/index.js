@@ -4,6 +4,7 @@ import { group, scaleOrdinal, schemeSet3 } from "d3";
 import { LoadData } from "./loadData";
 import { MutantMap } from "./mutantMap";
 import { DateGraph } from "./dateGraph";
+import { ColorLegend } from "./colorLegend";
 
 const root = document.getElementById("mutantLandscape");
 
@@ -50,6 +51,11 @@ const App = () => {
                 width={width * dateGraphSpecs.w}
                 height={height * dateGraphSpecs.h}
             ></DateGraph>
+            <g transform={`translate(${width - 100}, 20)`}>
+                <ColorLegend
+                    mutColorScale={mutColorScale}
+                ></ColorLegend>
+            </g>
             <g transform={`translate(0, ${height * dateGraphSpecs.h})`}>
                 <MutantMap
                     landscapeData={landscapeData}

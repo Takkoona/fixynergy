@@ -55,14 +55,12 @@ export function parseData(mutantNode, mutantFreq) {
         for (let i = 0; i < mutLink.length; i += MUT_INFO_LEN) {
             const [parentId, ...mut] = mutLink.slice(i, i + MUT_INFO_LEN);
             parentLinks.push([landscapeData.get(parentId), mut]);
-            if (dailyRatio.length) {
-                for (let j = 0; j < dailyRatio.length; j++) {
-                    mutFreq.push({
-                        "mut": mutationName(...mut),
-                        "date": dailyRatio[j]["date"],
-                        "ratio": dailyRatio[j]["ratio"]
-                    });
-                };
+            for (let j = 0; j < dailyRatio.length; j++) {
+                mutFreq.push({
+                    "mut": mutationName(...mut),
+                    "date": dailyRatio[j]["date"],
+                    "ratio": dailyRatio[j]["ratio"]
+                });
             };
         };
         if (mutLink.length > prevMutLinkLength) {

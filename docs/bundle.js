@@ -2,6 +2,41 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./websrc/colorLegend/index.js":
+/*!*************************************!*\
+  !*** ./websrc/colorLegend/index.js ***!
+  \*************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ColorLegend": () => (/* binding */ ColorLegend)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+var tickSpacing = 20;
+var tickSize = 5;
+function ColorLegend(_ref) {
+  var mutColorScale = _ref.mutColorScale;
+  return mutColorScale.domain().map(function (mutName, i) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+      key: "".concat(mutName, "_legend"),
+      transform: "translate(0, ".concat(i * tickSpacing, ")")
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
+      fill: mutColorScale(mutName),
+      r: tickSize
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("text", {
+      x: 10,
+      fontSize: 10,
+      dy: "0.32em"
+    }, mutName));
+  });
+}
+;
+
+/***/ }),
+
 /***/ "./websrc/dateGraph/Axses.js":
 /*!***********************************!*\
   !*** ./websrc/dateGraph/Axses.js ***!
@@ -35,6 +70,7 @@ function AxisBottom(_ref) {
         textAnchor: 'middle'
       },
       y: innerHeight + tickOffset,
+      dy: ".71em",
       fontSize: "10"
     }, xAxisTickFormat(tickValue)));
   });
@@ -57,6 +93,7 @@ function AxisLeft(_ref2) {
         textAnchor: 'end'
       },
       x: -tickOffset,
+      dy: ".32em",
       fontSize: "10"
     }, tickValue));
   });
@@ -155,7 +192,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var margin = {
   top: 10,
-  right: 30,
+  right: 200,
   bottom: 20,
   left: 30
 };
@@ -165,15 +202,13 @@ var xValue = function xValue(d) {
 };
 
 var xAxisTickFormat = (0,d3__WEBPACK_IMPORTED_MODULE_1__.timeFormat)('%m/%d/%Y');
-var xTickOffset = 20;
-var xAxisLabel = "Collection Date";
+var xTickOffset = 10;
 
 var yValue = function yValue(d) {
   return d["ratio"];
 };
 
-var yTickOffset = 1;
-var yAxisLabel = "Mutation Ratio";
+var yTickOffset = 10;
 function DateGraph(_ref) {
   var mutDailyFreq = _ref.mutDailyFreq,
       mutColorScale = _ref.mutColorScale,
@@ -197,8 +232,8 @@ function DateGraph(_ref) {
     innerHeigth: innerHeight
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Axses__WEBPACK_IMPORTED_MODULE_2__.AxisBottom, {
     xScale: xScale,
-    innerHeight: innerHeight,
     xAxisTickFormat: xAxisTickFormat,
+    innerHeight: innerHeight,
     tickOffset: xTickOffset
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Axses__WEBPACK_IMPORTED_MODULE_2__.AxisLeft, {
     yScale: yScale,
@@ -206,6 +241,7 @@ function DateGraph(_ref) {
     tickOffset: yTickOffset
   }));
 }
+;
 
 /***/ }),
 
@@ -380,16 +416,12 @@ function parseData(mutantNode, mutantFreq) {
 
       parentLinks.push([landscapeData.get(parentId), mut]);
 
-      if (dailyRatio.length) {
-        for (var j = 0; j < dailyRatio.length; j++) {
-          mutFreq.push({
-            "mut": _utils__WEBPACK_IMPORTED_MODULE_1__.mutationName.apply(void 0, _toConsumableArray(mut)),
-            "date": dailyRatio[j]["date"],
-            "ratio": dailyRatio[j]["ratio"]
-          });
-        }
-
-        ;
+      for (var j = 0; j < dailyRatio.length; j++) {
+        mutFreq.push({
+          "mut": _utils__WEBPACK_IMPORTED_MODULE_1__.mutationName.apply(void 0, _toConsumableArray(mut)),
+          "date": dailyRatio[j]["date"],
+          "ratio": dailyRatio[j]["ratio"]
+        });
       }
 
       ;
@@ -560,9 +592,12 @@ function MutantNode(_ref) {
       return undefined;
     }
 
-    var minRatioSum = Infinity;
-    var nodeStrokeColor = "grey";
-    var maxIncreMut = null;
+    var mutIncreValues = [];
+    var pieRadius = nodeSizeScale(mutSetNode.ratioSum);
+    var arcScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.arc)().innerRadius(0).outerRadius(pieRadius);
+    var pieScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.pie)().value(function (d) {
+      return d["ratioDiff"];
+    });
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
       key: mutSetId
     }, mutSetNode.parentLinks.map(function (_ref4) {
@@ -571,15 +606,11 @@ function MutantNode(_ref) {
           mut = _ref5[1];
 
       var mutName = _utils__WEBPACK_IMPORTED_MODULE_2__.mutationName.apply(void 0, _toConsumableArray(mut));
-      var currRatioSum = parent.ratioSum;
-
-      if (currRatioSum < minRatioSum) {
-        minRatioSum = currRatioSum;
-        maxIncreMut = mutName;
-        nodeStrokeColor = mutColorScale(maxIncreMut);
-      }
-
       var ratioDiff = mutSetNode.ratioSum - parent.ratioSum;
+      mutIncreValues.push({
+        mutName: mutName,
+        ratioDiff: ratioDiff
+      });
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", {
         key: [mutSetId, parent.id].join(","),
         x1: parent.x,
@@ -591,14 +622,30 @@ function MutantNode(_ref) {
         ,
         stroke: mutColorScale(mutName)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, "Mutation: ".concat(mutName)));
-    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+      transform: "translate(".concat(x, ", ").concat(y, ")")
+    }, pieScale(mutIncreValues).map(function (_ref6) {
+      var data = _ref6.data,
+          startAngle = _ref6.startAngle,
+          endAngle = _ref6.endAngle;
+      var mutName = data["mutName"];
+      var pieArcColor = mutColorScale(mutName);
+      var arcPathGen = arcScale.startAngle(startAngle).endAngle(endAngle);
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("path", {
+        key: "".concat(mutSetId).concat(mutName, "_pie"),
+        d: arcPathGen(),
+        fill: pieArcColor,
+        fillOpacity: "0.5",
+        stroke: pieArcColor,
+        strokeWidth: "1"
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, data["mutName"]));
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, mutSetNode.getMutName())), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
       key: mutSetId.toString() + "node",
       cx: x,
       cy: y,
-      r: nodeSizeScale(mutSetNode.ratioSum),
-      fill: nodeStrokeColor,
-      fillOpacity: "0.5",
-      stroke: nodeStrokeColor,
+      r: pieRadius,
+      fill: "none",
+      stroke: "#d3d3d3",
       strokeWidth: "1"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, mutSetNode.getMutName())));
   });
@@ -67643,6 +67690,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _loadData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./loadData */ "./websrc/loadData/index.js");
 /* harmony import */ var _mutantMap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./mutantMap */ "./websrc/mutantMap/index.js");
 /* harmony import */ var _dateGraph__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./dateGraph */ "./websrc/dateGraph/index.js");
+/* harmony import */ var _colorLegend__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./colorLegend */ "./websrc/colorLegend/index.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -67654,6 +67702,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 
 
@@ -67718,6 +67767,10 @@ var App = function App() {
     width: width * dateGraphSpecs.w,
     height: height * dateGraphSpecs.h
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+    transform: "translate(".concat(width - 100, ", 20)")
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_colorLegend__WEBPACK_IMPORTED_MODULE_6__.ColorLegend, {
+    mutColorScale: mutColorScale
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
     transform: "translate(0, ".concat(height * dateGraphSpecs.h, ")")
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mutantMap__WEBPACK_IMPORTED_MODULE_4__.MutantMap, {
     landscapeData: landscapeData,

@@ -3,16 +3,14 @@ import { timeFormat, scaleTime, scaleLinear } from "d3";
 import { AxisBottom, AxisLeft } from "./Axses";
 import { DotMarks } from "./Marks";
 
-const margin = { top: 10, right: 30, bottom: 20, left: 30 };
+const margin = { top: 10, right: 200, bottom: 20, left: 30 };
 
 const xValue = d => d["date"];
 const xAxisTickFormat = timeFormat('%m/%d/%Y');
-const xTickOffset = 20;
-const xAxisLabel = "Collection Date";
+const xTickOffset = 10;
 
 const yValue = d => d["ratio"];
-const yTickOffset = 1;
-const yAxisLabel = "Mutation Ratio";
+const yTickOffset = 10;
 
 export function DateGraph({
     mutDailyFreq,
@@ -42,8 +40,8 @@ export function DateGraph({
             ></DotMarks>
             <AxisBottom
                 xScale={xScale}
-                innerHeight={innerHeight}
                 xAxisTickFormat={xAxisTickFormat}
+                innerHeight={innerHeight}
                 tickOffset={xTickOffset}
             ></AxisBottom>
             <AxisLeft
@@ -53,4 +51,4 @@ export function DateGraph({
             ></AxisLeft>
         </g>
     );
-}
+};
