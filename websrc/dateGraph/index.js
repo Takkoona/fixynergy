@@ -37,7 +37,6 @@ export function DateGraph({
                 yScale={yScale}
                 yValue={yValue}
                 colorScale={mutColorScale}
-                innerHeigth={innerHeight}
                 hoveredMut={hoveredMut}
             ></DotMarks>
             <AxisBottom

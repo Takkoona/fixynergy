@@ -10,11 +10,10 @@ export function DotMarks({
     yScale,
     yValue,
     colorScale,
-    innerHeigth,
     hoveredMut
 }) {
     return Array.from(groupedData).map(([mut, data]) => {
-        const linePath = line().x(d => xScale(xValue(d))).y(d => innerHeigth - yScale(yValue(d)));
+        const linePath = line().x(d => xScale(xValue(d))).y(d => yScale(yValue(d)));
         data = data.sort((a, b) => xValue(a) - xValue(b));
         return (
             <g
@@ -33,7 +32,7 @@ export function DotMarks({
                     <circle
                         key={`${d["mut"]}${xAxisTickFormat(xValue(d))}`}
                         cx={xScale(xValue(d))}
-                        cy={innerHeigth - yScale(yValue(d))}
+                        cy={yScale(yValue(d))}
                         r="2"
                         fill={colorScale(mut)}
                         opacity={setMutOpacity(hoveredMut, mut)}

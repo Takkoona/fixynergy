@@ -149,7 +149,6 @@ function DotMarks(_ref) {
       yScale = _ref.yScale,
       yValue = _ref.yValue,
       colorScale = _ref.colorScale,
-      innerHeigth = _ref.innerHeigth,
       hoveredMut = _ref.hoveredMut;
   return Array.from(groupedData).map(function (_ref2) {
     var _ref3 = _slicedToArray(_ref2, 2),
@@ -159,7 +158,7 @@ function DotMarks(_ref) {
     var linePath = (0,d3__WEBPACK_IMPORTED_MODULE_1__.line)().x(function (d) {
       return xScale(xValue(d));
     }).y(function (d) {
-      return innerHeigth - yScale(yValue(d));
+      return yScale(yValue(d));
     });
     data = data.sort(function (a, b) {
       return xValue(a) - xValue(b);
@@ -182,7 +181,7 @@ function DotMarks(_ref) {
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
         key: "".concat(d["mut"]).concat(xAxisTickFormat(xValue(d))),
         cx: xScale(xValue(d)),
-        cy: innerHeigth - yScale(yValue(d)),
+        cy: yScale(yValue(d)),
         r: "2",
         fill: colorScale(mut),
         opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
@@ -252,7 +251,6 @@ function DateGraph(_ref) {
     yScale: yScale,
     yValue: yValue,
     colorScale: mutColorScale,
-    innerHeigth: innerHeight,
     hoveredMut: hoveredMut
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Axses__WEBPACK_IMPORTED_MODULE_2__.AxisBottom, {
     xScale: xScale,
