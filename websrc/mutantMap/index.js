@@ -12,7 +12,8 @@ export function MutantMap({
     mutColorScale,
     maxRatioSum,
     width,
-    height
+    height,
+    hoveredMut
 }) {
 
     const innerWidth = width - margin.left - margin.right;
@@ -43,6 +44,7 @@ export function MutantMap({
                 xScale={xScale}
                 yScales={yScales}
                 nodeSizeScale={nodeSizeScale}
+                hoveredMut={hoveredMut}                
             ></MutantNode>
         </g>
     );

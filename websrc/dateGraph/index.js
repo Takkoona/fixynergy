@@ -17,7 +17,8 @@ export function DateGraph({
     mutColorScale,
     dateRange,
     width,
-    height
+    height,
+    hoveredMut
 }) {
 
     const innerWidth = width - margin.left - margin.right;
@@ -37,6 +38,7 @@ export function DateGraph({
                 yValue={yValue}
                 colorScale={mutColorScale}
                 innerHeigth={innerHeight}
+                hoveredMut={hoveredMut}
             ></DotMarks>
             <AxisBottom
                 xScale={xScale}

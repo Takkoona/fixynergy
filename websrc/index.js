@@ -15,21 +15,21 @@ const App = () => {
 
     const [width, setWidth] = useState(root.offsetWidth);
     const [height, setHeight] = useState(root.offsetHeight);
-
-    const handleResize = () => {
-        setWidth(root.offsetWidth);
-        setHeight(root.offsetHeight);
-    }
+    const [hoveredMut, setHoveredMut] = useState(null);
 
     useEffect(() => {
+        const handleResize = () => {
+            setWidth(root.offsetWidth);
+            setHeight(root.offsetHeight);
+        };
         window.addEventListener("resize", handleResize);
         return () => {
             window.removeEventListener("resize", handleResize);
-        }
-    }, [])
+        };
+    }, []);
 
     const data = LoadData();
-    if (!data) return <pre>Loading...</pre>
+    if (!data) { return <pre>Loading...</pre>; };
     const [
         landscapeData,
         laneLengths,
@@ -50,10 +50,13 @@ const App = () => {
                 dateRange={dateRange}
                 width={width * dateGraphSpecs.w}
                 height={height * dateGraphSpecs.h}
+                hoveredMut={hoveredMut}
             ></DateGraph>
             <g transform={`translate(${width - 100}, 20)`}>
                 <ColorLegend
                     mutColorScale={mutColorScale}
+                    hoveredMut={hoveredMut}
+                    setHoveredMut={setHoveredMut}
                 ></ColorLegend>
             </g>
             <g transform={`translate(0, ${height * dateGraphSpecs.h})`}>
@@ -65,6 +68,7 @@ const App = () => {
                     maxRatioSum={maxRatioSum}
                     width={width * landscapeSpecs.w}
                     height={height * landscapeSpecs.h}
+                    hoveredMut={hoveredMut}
                 ></MutantMap>
             </g>
         </svg>

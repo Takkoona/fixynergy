@@ -14,15 +14,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./websrc/utils/index.js");
+
 
 var tickSpacing = 20;
 var tickSize = 5;
 function ColorLegend(_ref) {
-  var mutColorScale = _ref.mutColorScale;
+  var mutColorScale = _ref.mutColorScale,
+      hoveredMut = _ref.hoveredMut,
+      setHoveredMut = _ref.setHoveredMut;
   return mutColorScale.domain().map(function (mutName, i) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
       key: "".concat(mutName, "_legend"),
-      transform: "translate(0, ".concat(i * tickSpacing, ")")
+      transform: "translate(0, ".concat(i * tickSpacing, ")"),
+      onMouseEnter: function onMouseEnter() {
+        setHoveredMut(mutName);
+      },
+      onMouseOut: function onMouseOut() {
+        setHoveredMut(null);
+      },
+      opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_1__.setMutOpacity)(hoveredMut, mutName)
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
       fill: mutColorScale(mutName),
       r: tickSize
@@ -114,6 +125,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils */ "./websrc/utils/index.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -128,6 +140,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
 function DotMarks(_ref) {
   var groupedData = _ref.groupedData,
       xScale = _ref.xScale,
@@ -136,7 +149,8 @@ function DotMarks(_ref) {
       yScale = _ref.yScale,
       yValue = _ref.yValue,
       colorScale = _ref.colorScale,
-      innerHeigth = _ref.innerHeigth;
+      innerHeigth = _ref.innerHeigth,
+      hoveredMut = _ref.hoveredMut;
   return Array.from(groupedData).map(function (_ref2) {
     var _ref3 = _slicedToArray(_ref2, 2),
         mut = _ref3[0],
@@ -151,7 +165,14 @@ function DotMarks(_ref) {
       return xValue(a) - xValue(b);
     });
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
-      key: mut
+      key: mut,
+      onMouseEnter: function onMouseEnter() {
+        setHoveredMut(mut);
+      },
+      onMouseOut: function onMouseOut() {
+        setHoveredMut(null);
+      },
+      opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("path", {
       key: mut + "line",
       fill: "none",
@@ -163,7 +184,8 @@ function DotMarks(_ref) {
         cx: xScale(xValue(d)),
         cy: innerHeigth - yScale(yValue(d)),
         r: "2",
-        fill: colorScale(mut)
+        fill: colorScale(mut),
+        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
       });
     }));
   });
@@ -214,7 +236,8 @@ function DateGraph(_ref) {
       mutColorScale = _ref.mutColorScale,
       dateRange = _ref.dateRange,
       width = _ref.width,
-      height = _ref.height;
+      height = _ref.height,
+      hoveredMut = _ref.hoveredMut;
   var innerWidth = width - margin.left - margin.right;
   var innerHeight = height - margin.top - margin.bottom;
   var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleTime)().domain(dateRange).range([0, innerWidth]).nice();
@@ -229,7 +252,8 @@ function DateGraph(_ref) {
     yScale: yScale,
     yValue: yValue,
     colorScale: mutColorScale,
-    innerHeigth: innerHeight
+    innerHeigth: innerHeight,
+    hoveredMut: hoveredMut
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Axses__WEBPACK_IMPORTED_MODULE_2__.AxisBottom, {
     xScale: xScale,
     xAxisTickFormat: xAxisTickFormat,
@@ -572,12 +596,14 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
 function MutantNode(_ref) {
   var landscapeData = _ref.landscapeData,
       mutColorScale = _ref.mutColorScale,
       xScale = _ref.xScale,
       yScales = _ref.yScales,
-      nodeSizeScale = _ref.nodeSizeScale;
+      nodeSizeScale = _ref.nodeSizeScale,
+      hoveredMut = _ref.hoveredMut;
   return Array.from(landscapeData).map(function (_ref2) {
     var _ref3 = _slicedToArray(_ref2, 2),
         mutSetId = _ref3[0],
@@ -618,8 +644,7 @@ function MutantNode(_ref) {
         x2: x,
         y2: y,
         strokeWidth: "1",
-        opacity: (0,d3__WEBPACK_IMPORTED_MODULE_1__.max)([ratioDiff, 0]) // opacity={1}
-        ,
+        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, 0, (0,d3__WEBPACK_IMPORTED_MODULE_1__.max)([ratioDiff, 0])),
         stroke: mutColorScale(mutName)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, "Mutation: ".concat(mutName)));
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
@@ -635,11 +660,11 @@ function MutantNode(_ref) {
         key: "".concat(mutSetId).concat(mutName, "_pie"),
         d: arcPathGen(),
         fill: pieArcColor,
-        fillOpacity: "0.5",
+        fillOpacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, 0.05, 0.5),
         stroke: pieArcColor,
-        strokeWidth: "1"
+        strokeOpacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, data["mutName"]));
-    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, mutSetNode.getMutName())), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
+    })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
       key: mutSetId.toString() + "node",
       cx: x,
       cy: y,
@@ -685,7 +710,8 @@ function MutantMap(_ref) {
       mutColorScale = _ref.mutColorScale,
       maxRatioSum = _ref.maxRatioSum,
       width = _ref.width,
-      height = _ref.height;
+      height = _ref.height,
+      hoveredMut = _ref.hoveredMut;
   var innerWidth = width - margin.left - margin.right;
   var innerHeight = height - margin.top - margin.bottom;
   var yScales = laneLengths.map(function (l) {
@@ -719,7 +745,8 @@ function MutantMap(_ref) {
     mutColorScale: mutColorScale,
     xScale: xScale,
     yScales: yScales,
-    nodeSizeScale: nodeSizeScale
+    nodeSizeScale: nodeSizeScale,
+    hoveredMut: hoveredMut
   }));
 }
 ;
@@ -734,10 +761,16 @@ function MutantMap(_ref) {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "mutationName": () => (/* binding */ mutationName)
+/* harmony export */   "mutationName": () => (/* binding */ mutationName),
+/* harmony export */   "setMutOpacity": () => (/* binding */ setMutOpacity)
 /* harmony export */ });
 function mutationName(protein, pos, state) {
   return "".concat(protein, "_").concat(pos).concat(state);
+}
+function setMutOpacity(hoveredMut, mutName) {
+  var unhoveredOpacity = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.15;
+  var hoveredOpacity = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
+  return hoveredMut && mutName !== hoveredMut ? unhoveredOpacity : hoveredOpacity;
 }
 
 /***/ }),
@@ -67731,19 +67764,29 @@ var App = function App() {
       height = _useState4[0],
       setHeight = _useState4[1];
 
-  var handleResize = function handleResize() {
-    setWidth(root.offsetWidth);
-    setHeight(root.offsetHeight);
-  };
+  var _useState5 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
+      _useState6 = _slicedToArray(_useState5, 2),
+      hoveredMut = _useState6[0],
+      setHoveredMut = _useState6[1];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var handleResize = function handleResize() {
+      setWidth(root.offsetWidth);
+      setHeight(root.offsetHeight);
+    };
+
     window.addEventListener("resize", handleResize);
     return function () {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
   var data = (0,_loadData__WEBPACK_IMPORTED_MODULE_3__.LoadData)();
-  if (!data) return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("pre", null, "Loading...");
+
+  if (!data) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("pre", null, "Loading...");
+  }
+
+  ;
 
   var _data = _slicedToArray(data, 6),
       landscapeData = _data[0],
@@ -67765,11 +67808,14 @@ var App = function App() {
     mutColorScale: mutColorScale,
     dateRange: dateRange,
     width: width * dateGraphSpecs.w,
-    height: height * dateGraphSpecs.h
+    height: height * dateGraphSpecs.h,
+    hoveredMut: hoveredMut
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
     transform: "translate(".concat(width - 100, ", 20)")
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_colorLegend__WEBPACK_IMPORTED_MODULE_6__.ColorLegend, {
-    mutColorScale: mutColorScale
+    mutColorScale: mutColorScale,
+    hoveredMut: hoveredMut,
+    setHoveredMut: setHoveredMut
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
     transform: "translate(0, ".concat(height * dateGraphSpecs.h, ")")
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mutantMap__WEBPACK_IMPORTED_MODULE_4__.MutantMap, {
@@ -67779,7 +67825,8 @@ var App = function App() {
     mutColorScale: mutColorScale,
     maxRatioSum: maxRatioSum,
     width: width * landscapeSpecs.w,
-    height: height * landscapeSpecs.h
+    height: height * landscapeSpecs.h,
+    hoveredMut: hoveredMut
   })));
 };
 

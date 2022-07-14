@@ -1,13 +1,15 @@
 import React from "react";
 import { max, pie, arc } from "d3";
 import { mutationName } from "../utils";
+import { setMutOpacity } from "../utils";
 
 export function MutantNode({
     landscapeData,
     mutColorScale,
     xScale,
     yScales,
-    nodeSizeScale
+    nodeSizeScale,
+    hoveredMut
 }) {
     return Array.from(landscapeData).map(([mutSetId, mutSetNode]) => {
         const [x, y] = mutSetNode.setCoord(xScale, yScales).getCoord();
@@ -32,8 +34,7 @@ export function MutantNode({
                             x2={x}
                             y2={y}
                             strokeWidth="1"
-                            opacity={max([ratioDiff, 0])}
-                            // opacity={1}
+                            opacity={setMutOpacity(hoveredMut, mutName, 0, max([ratioDiff, 0]))}
                             stroke={mutColorScale(mutName)}
                         >
                             <title>{`Mutation: ${mutName}`}</title>
@@ -54,15 +55,14 @@ export function MutantNode({
                                 key={`${mutSetId}${mutName}_pie`}
                                 d={arcPathGen()}
                                 fill={pieArcColor}
-                                fillOpacity="0.5"
+                                fillOpacity={setMutOpacity(hoveredMut, mutName, 0.05, 0.5)}
                                 stroke={pieArcColor}
-                                strokeWidth="1"
+                                strokeOpacity={setMutOpacity(hoveredMut, mutName)}
                             >
                                 <title>{data["mutName"]}</title>
                             </path>
                         )
                     })}
-                    <title>{mutSetNode.getMutName()}</title>
                 </g>
                 <circle
                     key={mutSetId.toString() + "node"}
