@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { group, scaleOrdinal, schemeSet3 } from "d3";
+import { group, scaleOrdinal, schemeSet1 } from "d3";
 import { LoadData } from "./loadData";
 import { MutantMap } from "./mutantMap";
 import { DateGraph } from "./dateGraph";
@@ -16,6 +16,7 @@ const App = () => {
     const [width, setWidth] = useState(root.offsetWidth);
     const [height, setHeight] = useState(root.offsetHeight);
     const [hoveredMut, setHoveredMut] = useState(null);
+    const [brushExtent, setBrushExtent] = useState(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -32,15 +33,13 @@ const App = () => {
     if (!data) { return <pre>Loading...</pre>; };
     const [
         landscapeData,
-        laneLengths,
-        laneExist,
         dailyMutFreq,
         maxRatioSum,
         dateRange
     ] = data;
 
     const mutDailyFreq = group(dailyMutFreq, d => d["mut"]);
-    const mutColorScale = scaleOrdinal().domain(mutDailyFreq.keys()).range(schemeSet3);
+    const mutColorScale = scaleOrdinal().domain(mutDailyFreq.keys()).range(schemeSet1);
 
     return (
         <svg width={width} height={height}>
@@ -62,8 +61,6 @@ const App = () => {
             <g transform={`translate(0, ${height * dateGraphSpecs.h})`}>
                 <MutantMap
                     landscapeData={landscapeData}
-                    laneLengths={laneLengths}
-                    laneExist={laneExist}
                     mutColorScale={mutColorScale}
                     maxRatioSum={maxRatioSum}
                     width={width * landscapeSpecs.w}
