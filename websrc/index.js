@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { createRoot } from "react-dom/client";
 import { group, scaleOrdinal, schemeSet1 } from "d3";
-import { LoadData } from "./loadData";
-import { MutantMap } from "./mutantMap";
-import { DateGraph } from "./dateGraph";
-import { ColorLegend } from "./colorLegend";
+import { useMutantNode, useMutantFreq, parseData } from "./loadData";
+import { MutantMap, DateGraph, ColorLegend } from "./components";
+
+const rawDataUrl = "https://gist.githubusercontent.com/Takkoona/854b54ed3148561f95e395350d16ff45/raw/4ad38d75214136e74b4b7bb7f614b42f25a27364";
 
 const root = document.getElementById("mutantLandscape");
 
@@ -29,8 +29,15 @@ const App = () => {
         };
     }, []);
 
-    const data = LoadData();
-    if (!data) { return <pre>Loading...</pre>; };
+    const mutNodeUrl = `${rawDataUrl}/USA_mut_node.json`;
+    const mutFreqUrl = `${rawDataUrl}/USA_mut_freq.csv`;
+
+    const mutantNode = useMutantNode(mutNodeUrl);
+    const mutantFreq = useMutantFreq(mutFreqUrl);
+
+    if (!mutantNode || !mutantFreq) { return <pre>Loading...</pre>; };
+
+    const data = parseData(mutantNode, mutantFreq);
     const [
         landscapeData,
         dailyMutFreq,
