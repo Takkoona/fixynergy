@@ -1,21 +1,29 @@
-import { useState, useEffect } from 'react';
-import { csv, json } from 'd3';
+import { useState, useEffect } from "react";
+import { json, csv } from "d3";
+import { parseData } from "./processData";
 
-export function useMutantNode(mutNodeUrl) {
-    const [data, setData] = useState(null);
-    useEffect(() => { json(mutNodeUrl).then(setData); }, [mutNodeUrl]);
-    return data;
-};
+const rawDataUrl = "https://gist.githubusercontent.com/Takkoona/854b54ed3148561f95e395350d16ff45/raw/4ad38d75214136e74b4b7bb7f614b42f25a27364";
 
-export function useMutantFreq(mutFreqUrl) {
+export function useData() {
+
+    const mutNodeUrl = `${rawDataUrl}/USA_mut_node.json`;
+    const mutFreqUrl = `${rawDataUrl}/USA_mut_freq.csv`;
+
     const [data, setData] = useState(null);
+
     useEffect(() => {
-        csv(mutFreqUrl, d => {
-            d["mut_set_id"] = +d["mut_set_id"];
-            d["date"] = new Date(d["date"]);
-            d["ratio"] = +d["ratio"];
-            return d;
-        }).then(setData);
-    }, [mutFreqUrl]);
+        Promise.all([
+            json(mutNodeUrl),
+            csv(mutFreqUrl, d => {
+                d["mut_set_id"] = +d["mut_set_id"];
+                d["date"] = new Date(d["date"]);
+                d["ratio"] = +d["ratio"];
+                return d;
+            })
+        ]).then(([mutantNode, mutantFreq]) => {
+            setData(parseData(mutantNode, mutantFreq));
+        })
+    }, [mutNodeUrl, mutFreqUrl]);
+
     return data;
 };

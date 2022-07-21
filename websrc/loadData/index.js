@@ -1,2 +1,1 @@
-export { useMutantNode, useMutantFreq } from "./useData";
-export { parseData } from "./processData";
+export { useData } from "./useData";

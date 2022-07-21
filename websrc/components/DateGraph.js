@@ -1,5 +1,5 @@
-import React from "react";
-import { timeFormat, scaleTime, scaleLinear, line } from "d3";
+import React, { useEffect, useRef } from "react";
+import { timeFormat, scaleTime, scaleLinear, line, brushX, select } from "d3";
 import { setMutOpacity } from "../utils";
 
 const margin = { top: 10, right: 200, bottom: 20, left: 30 };
@@ -17,14 +17,25 @@ export function DateGraph({
     dateRange,
     width,
     height,
-    hoveredMut
+    hoveredMut,
+    setBrushExtent
 }) {
 
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
-
+    
+    const brushRef = useRef();
+    
     const xScale = scaleTime().domain(dateRange).range([0, innerWidth]);
     const yScale = scaleLinear().domain([0, 1]).range([innerHeight, 0]);
+
+    useEffect(() => {
+        const brush = brushX().extent([[0, 0], [innerWidth, innerHeight]]);
+        brush(select(brushRef.current));
+        brush.on("brush end", (event) => {
+            setBrushExtent(event.selection && event.selection.map(xScale.invert));
+        });
+    }, [innerWidth, innerHeight]);
 
     return (
         <g transform={`translate(${margin.left}, ${margin.top})`}>
@@ -43,6 +54,7 @@ export function DateGraph({
                 yScale={yScale}
                 innerWidth={innerWidth}
             ></AxisLeft>
+            <g ref={brushRef}></g>
         </g>
     );
 };
@@ -96,12 +108,7 @@ function DotMarks({
         const linePath = line().x(d => xScale(xValue(d))).y(d => yScale(yValue(d)));
         data = data.sort((a, b) => xValue(a) - xValue(b));
         return (
-            <g
-                key={mut}
-                onMouseEnter={() => { setHoveredMut(mut); }}
-                onMouseOut={() => { setHoveredMut(null); }}
-                opacity={setMutOpacity(hoveredMut, mut)}
-            >
+            <g key={mut} opacity={setMutOpacity(hoveredMut, mut)}>
                 <path
                     key={`${mut}line`}
                     fill="none"

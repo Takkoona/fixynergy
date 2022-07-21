@@ -2,10 +2,10 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./websrc/colorLegend/index.js":
-/*!*************************************!*\
-  !*** ./websrc/colorLegend/index.js ***!
-  \*************************************/
+/***/ "./websrc/components/ColorLegend.js":
+/*!******************************************!*\
+  !*** ./websrc/components/ColorLegend.js ***!
+  \******************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -48,79 +48,15 @@ function ColorLegend(_ref) {
 
 /***/ }),
 
-/***/ "./websrc/dateGraph/Axses.js":
-/*!***********************************!*\
-  !*** ./websrc/dateGraph/Axses.js ***!
-  \***********************************/
+/***/ "./websrc/components/DateGraph.js":
+/*!****************************************!*\
+  !*** ./websrc/components/DateGraph.js ***!
+  \****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "AxisBottom": () => (/* binding */ AxisBottom),
-/* harmony export */   "AxisLeft": () => (/* binding */ AxisLeft)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-
-function AxisBottom(_ref) {
-  var xScale = _ref.xScale,
-      innerHeight = _ref.innerHeight,
-      xAxisTickFormat = _ref.xAxisTickFormat,
-      tickOffset = _ref.tickOffset;
-  return xScale.ticks().map(function (tickValue) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
-      key: tickValue,
-      transform: "translate(".concat(xScale(tickValue), ", 0)")
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", {
-      strokeWidth: "1",
-      stroke: "black",
-      opacity: "0.1",
-      y2: innerHeight
-    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("text", {
-      style: {
-        textAnchor: 'middle'
-      },
-      y: innerHeight + tickOffset,
-      dy: ".71em",
-      fontSize: "10"
-    }, xAxisTickFormat(tickValue)));
-  });
-}
-function AxisLeft(_ref2) {
-  var yScale = _ref2.yScale,
-      innerWidth = _ref2.innerWidth,
-      tickOffset = _ref2.tickOffset;
-  return yScale.ticks().map(function (tickValue) {
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
-      key: tickValue,
-      transform: "translate(0,".concat(yScale(tickValue), ")")
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", {
-      strokeWidth: "1",
-      stroke: "black",
-      opacity: "0.1",
-      x2: innerWidth
-    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("text", {
-      style: {
-        textAnchor: 'end'
-      },
-      x: -tickOffset,
-      dy: ".32em",
-      fontSize: "10"
-    }, tickValue));
-  });
-}
-
-/***/ }),
-
-/***/ "./websrc/dateGraph/Marks.js":
-/*!***********************************!*\
-  !*** ./websrc/dateGraph/Marks.js ***!
-  \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DotMarks": () => (/* binding */ DotMarks)
+/* harmony export */   "DateGraph": () => (/* binding */ DateGraph)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -137,76 +73,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-
-
-
-function DotMarks(_ref) {
-  var groupedData = _ref.groupedData,
-      xScale = _ref.xScale,
-      xValue = _ref.xValue,
-      xAxisTickFormat = _ref.xAxisTickFormat,
-      yScale = _ref.yScale,
-      yValue = _ref.yValue,
-      colorScale = _ref.colorScale,
-      hoveredMut = _ref.hoveredMut;
-  return Array.from(groupedData).map(function (_ref2) {
-    var _ref3 = _slicedToArray(_ref2, 2),
-        mut = _ref3[0],
-        data = _ref3[1];
-
-    var linePath = (0,d3__WEBPACK_IMPORTED_MODULE_1__.line)().x(function (d) {
-      return xScale(xValue(d));
-    }).y(function (d) {
-      return yScale(yValue(d));
-    });
-    data = data.sort(function (a, b) {
-      return xValue(a) - xValue(b);
-    });
-    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
-      key: mut,
-      onMouseEnter: function onMouseEnter() {
-        setHoveredMut(mut);
-      },
-      onMouseOut: function onMouseOut() {
-        setHoveredMut(null);
-      },
-      opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
-    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("path", {
-      key: mut + "line",
-      fill: "none",
-      stroke: colorScale(mut),
-      d: linePath(data)
-    }), data.map(function (d) {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
-        key: "".concat(d["mut"]).concat(xAxisTickFormat(xValue(d))),
-        cx: xScale(xValue(d)),
-        cy: yScale(yValue(d)),
-        r: "2",
-        fill: colorScale(mut),
-        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
-      });
-    }));
-  });
-}
-
-/***/ }),
-
-/***/ "./websrc/dateGraph/index.js":
-/*!***********************************!*\
-  !*** ./websrc/dateGraph/index.js ***!
-  \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "DateGraph": () => (/* binding */ DateGraph)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
-/* harmony import */ var _Axses__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Axses */ "./websrc/dateGraph/Axses.js");
-/* harmony import */ var _Marks__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Marks */ "./websrc/dateGraph/Marks.js");
 
 
 
@@ -236,336 +102,137 @@ function DateGraph(_ref) {
       dateRange = _ref.dateRange,
       width = _ref.width,
       height = _ref.height,
-      hoveredMut = _ref.hoveredMut;
+      hoveredMut = _ref.hoveredMut,
+      setBrushExtent = _ref.setBrushExtent;
   var innerWidth = width - margin.left - margin.right;
   var innerHeight = height - margin.top - margin.bottom;
-  var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleTime)().domain(dateRange).range([0, innerWidth]).nice();
+  var brushRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
+  var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleTime)().domain(dateRange).range([0, innerWidth]);
   var yScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, 1]).range([innerHeight, 0]);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var brush = (0,d3__WEBPACK_IMPORTED_MODULE_1__.brushX)().extent([[0, 0], [innerWidth, innerHeight]]);
+    brush((0,d3__WEBPACK_IMPORTED_MODULE_1__.select)(brushRef.current));
+    brush.on("brush end", function (event) {
+      setBrushExtent(event.selection && event.selection.map(xScale.invert));
+    });
+  }, [innerWidth, innerHeight]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
     transform: "translate(".concat(margin.left, ", ").concat(margin.top, ")")
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Marks__WEBPACK_IMPORTED_MODULE_3__.DotMarks, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(DotMarks, {
     groupedData: mutDailyFreq,
     xScale: xScale,
-    xValue: xValue,
-    xAxisTickFormat: xAxisTickFormat,
     yScale: yScale,
-    yValue: yValue,
     colorScale: mutColorScale,
     hoveredMut: hoveredMut
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Axses__WEBPACK_IMPORTED_MODULE_2__.AxisBottom, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(AxisBottom, {
     xScale: xScale,
-    xAxisTickFormat: xAxisTickFormat,
-    innerHeight: innerHeight,
-    tickOffset: xTickOffset
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_Axses__WEBPACK_IMPORTED_MODULE_2__.AxisLeft, {
+    innerHeight: innerHeight
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(AxisLeft, {
     yScale: yScale,
-    innerWidth: innerWidth,
-    tickOffset: yTickOffset
+    innerWidth: innerWidth
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+    ref: brushRef
   }));
 }
 ;
 
-/***/ }),
-
-/***/ "./websrc/loadData/index.js":
-/*!**********************************!*\
-  !*** ./websrc/loadData/index.js ***!
-  \**********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "LoadData": () => (/* binding */ LoadData)
-/* harmony export */ });
-/* harmony import */ var _useData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./useData */ "./websrc/loadData/useData.js");
-/* harmony import */ var _processData__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./processData */ "./websrc/loadData/processData.js");
-
-
-var rawDataUrl = "https://gist.githubusercontent.com/Takkoona/854b54ed3148561f95e395350d16ff45/raw/4ad38d75214136e74b4b7bb7f614b42f25a27364";
-function LoadData() {
-  var mutNodeUrl = "".concat(rawDataUrl, "/USA_mut_node.json");
-  var mutFreqUrl = "".concat(rawDataUrl, "/USA_mut_freq.csv");
-  var mutantNode = (0,_useData__WEBPACK_IMPORTED_MODULE_0__.useMutantNode)(mutNodeUrl);
-  var mutantFreq = (0,_useData__WEBPACK_IMPORTED_MODULE_0__.useMutantFreq)(mutFreqUrl);
-
-  if (mutantFreq && mutantNode) {
-    return (0,_processData__WEBPACK_IMPORTED_MODULE_1__.parseData)(mutantNode, mutantFreq);
-  }
-
-  ;
-  return;
+function AxisBottom(_ref2) {
+  var xScale = _ref2.xScale,
+      innerHeight = _ref2.innerHeight;
+  return xScale.ticks().map(function (tickValue) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+      key: tickValue,
+      transform: "translate(".concat(xScale(tickValue), ", 0)")
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", {
+      strokeWidth: "1",
+      stroke: "black",
+      opacity: "0.1",
+      y2: innerHeight
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("text", {
+      style: {
+        textAnchor: 'middle'
+      },
+      y: innerHeight + xTickOffset,
+      dy: ".71em",
+      fontSize: "10"
+    }, xAxisTickFormat(tickValue)));
+  });
 }
 
-/***/ }),
-
-/***/ "./websrc/loadData/processData.js":
-/*!****************************************!*\
-  !*** ./websrc/loadData/processData.js ***!
-  \****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "parseData": () => (/* binding */ parseData)
-/* harmony export */ });
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./websrc/utils/index.js");
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _toArray(arr) { return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest(); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
-
-
-
-var MUT_INFO_LEN = 4;
-
-var LandscapeNode = /*#__PURE__*/function () {
-  function LandscapeNode(id, parentLinks, dailyRatio, ratioSum, laneIndex) {
-    _classCallCheck(this, LandscapeNode);
-
-    this.id = id;
-    this.parentLinks = parentLinks;
-    this.dailyRatio = dailyRatio;
-    this.ratioSum = ratioSum;
-    this.laneIndex = laneIndex;
-  }
-
-  _createClass(LandscapeNode, [{
-    key: "setCoord",
-    value: function setCoord(xScale, yScales) {
-      this.x = xScale(this.parentLinks.length);
-      this.y = yScales.at(this.parentLinks.length)(this.laneIndex + 1);
-      return this;
-    }
-  }, {
-    key: "getCoord",
-    value: function getCoord() {
-      return [this.x, this.y];
-    }
-  }, {
-    key: "setDateRange",
-    value: function setDateRange(startDate, endDate) {
-      this.ratioSum = 0;
-
-      for (var i = 0; i < this.dailyRatio.length; i++) {
-        var currDate = this.dailyRatio[i]["date"];
-
-        if (currDate >= startDate && currDate <= endDate) {
-          this.ratioSum += this.dailyRatio[i]["ratio"];
-        }
-      }
-
-      return this;
-    }
-  }, {
-    key: "getMutName",
-    value: function getMutName() {
-      return this.parentLinks.map(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            _ref2$ = _slicedToArray(_ref2[1], 3),
-            p = _ref2$[0],
-            n = _ref2$[1],
-            s = _ref2$[2];
-
-        return (0,_utils__WEBPACK_IMPORTED_MODULE_1__.mutationName)(p, n, s);
-      }).join(", ");
-    }
-  }]);
-
-  return LandscapeNode;
-}();
-
-function parseData(mutantNode, mutantFreq) {
-  var groupedMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.group)(mutantFreq, function (d) {
-    return d["mut_set_id"];
+function AxisLeft(_ref3) {
+  var yScale = _ref3.yScale,
+      innerWidth = _ref3.innerWidth;
+  return yScale.ticks().map(function (tickValue) {
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+      key: tickValue,
+      transform: "translate(0,".concat(yScale(tickValue), ")")
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("line", {
+      strokeWidth: "1",
+      stroke: "black",
+      opacity: "0.1",
+      x2: innerWidth
+    }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("text", {
+      style: {
+        textAnchor: 'end'
+      },
+      x: -yTickOffset,
+      dy: ".32em",
+      fontSize: "10"
+    }, tickValue));
   });
-  var mutFreq = []; // TODO: use Map for parent retrieve and return a nested array
-  // "laneLengths" and "laneExist" won't be needed this way
+}
 
-  var landscapeData = new Map();
-  var laneLengths = [];
-  var laneExist = [];
-  var laneRatioSum = 0;
-  var laneIndex = 0;
-  var prevMutLinkLength = -1;
-  var maxRatioSum = -1;
-  mutantNode.forEach(function (_ref3) {
-    var _ref4 = _toArray(_ref3),
-        mutSetId = _ref4[0],
-        mutLink = _ref4.slice(1);
+function DotMarks(_ref4) {
+  var groupedData = _ref4.groupedData,
+      xScale = _ref4.xScale,
+      yScale = _ref4.yScale,
+      colorScale = _ref4.colorScale,
+      hoveredMut = _ref4.hoveredMut;
+  return Array.from(groupedData).map(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 2),
+        mut = _ref6[0],
+        data = _ref6[1];
 
-    var dailyRatio = groupedMutFreq.get(mutSetId) || [];
-    var ratioSum = (0,d3__WEBPACK_IMPORTED_MODULE_0__.sum)(dailyRatio, function (d) {
-      return d["ratio"];
+    var linePath = (0,d3__WEBPACK_IMPORTED_MODULE_1__.line)().x(function (d) {
+      return xScale(xValue(d));
+    }).y(function (d) {
+      return yScale(yValue(d));
     });
-
-    if (ratioSum > maxRatioSum) {
-      maxRatioSum = ratioSum;
-    }
-
-    ;
-    laneRatioSum += ratioSum;
-    var parentLinks = [];
-
-    for (var i = 0; i < mutLink.length; i += MUT_INFO_LEN) {
-      var _mutLink$slice = mutLink.slice(i, i + MUT_INFO_LEN),
-          _mutLink$slice2 = _toArray(_mutLink$slice),
-          parentId = _mutLink$slice2[0],
-          mut = _mutLink$slice2.slice(1);
-
-      parentLinks.push([landscapeData.get(parentId), mut]);
-
-      for (var j = 0; j < dailyRatio.length; j++) {
-        mutFreq.push({
-          "mut": _utils__WEBPACK_IMPORTED_MODULE_1__.mutationName.apply(void 0, _toConsumableArray(mut)),
-          "date": dailyRatio[j]["date"],
-          "ratio": dailyRatio[j]["ratio"]
-        });
-      }
-
-      ;
-    }
-
-    ;
-
-    if (mutLink.length > prevMutLinkLength) {
-      laneLengths.push(laneIndex); // incremented in the last loop, should be length now
-
-      laneIndex = 0;
-      laneExist.push(Boolean(laneRatioSum)); // Total ratioSum of the last lane
-
-      laneRatioSum = 0;
-    }
-
-    ;
-    var mutSetNode = new LandscapeNode(mutSetId, parentLinks, dailyRatio, ratioSum, laneIndex++);
-    landscapeData.set(mutSetId, mutSetNode);
-    prevMutLinkLength = mutLink.length;
+    data = data.sort(function (a, b) {
+      return xValue(a) - xValue(b);
+    });
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+      key: mut,
+      opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
+    }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("path", {
+      key: "".concat(mut, "line"),
+      fill: "none",
+      stroke: colorScale(mut),
+      d: linePath(data)
+    }), data.map(function (d) {
+      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
+        key: "".concat(d["mut"]).concat(xAxisTickFormat(xValue(d))),
+        cx: xScale(xValue(d)),
+        cy: yScale(yValue(d)),
+        r: "2",
+        fill: colorScale(mut),
+        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
+      });
+    }));
   });
-  laneLengths.push(laneIndex);
-  laneLengths.shift(); // Remove the first
-
-  laneExist.push(Boolean(laneRatioSum));
-  laneExist.shift(); // Remove the first
-
-  var dailyMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.flatGroup)(mutFreq, function (d) {
-    return d["mut"];
-  }, function (d) {
-    return d["date"];
-  }).map(function (_ref5) {
-    var _ref6 = _slicedToArray(_ref5, 3),
-        n = _ref6[0],
-        d = _ref6[1],
-        ratio = _ref6[2];
-
-    return {
-      "mut": n,
-      "date": d,
-      "ratio": (0,d3__WEBPACK_IMPORTED_MODULE_0__.sum)(ratio, function (r) {
-        return r["ratio"];
-      })
-    };
-  });
-  var dateRange = (0,d3__WEBPACK_IMPORTED_MODULE_0__.extent)(dailyMutFreq, function (d) {
-    return d["date"];
-  });
-  return [landscapeData, laneLengths, laneExist, dailyMutFreq, maxRatioSum, dateRange];
 }
 
 /***/ }),
 
-/***/ "./websrc/loadData/useData.js":
-/*!************************************!*\
-  !*** ./websrc/loadData/useData.js ***!
-  \************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "useMutantFreq": () => (/* binding */ useMutantFreq),
-/* harmony export */   "useMutantNode": () => (/* binding */ useMutantNode)
-/* harmony export */ });
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-
-
-function useMutantNode(mutNodeUrl) {
-  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
-      _useState2 = _slicedToArray(_useState, 2),
-      data = _useState2[0],
-      setData = _useState2[1];
-
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    (0,d3__WEBPACK_IMPORTED_MODULE_1__.json)(mutNodeUrl).then(setData);
-  }, [mutNodeUrl]);
-  return data;
-}
-;
-function useMutantFreq(mutFreqUrl) {
-  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
-      _useState4 = _slicedToArray(_useState3, 2),
-      data = _useState4[0],
-      setData = _useState4[1];
-
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
-    (0,d3__WEBPACK_IMPORTED_MODULE_1__.csv)(mutFreqUrl, function (d) {
-      d["mut_set_id"] = +d["mut_set_id"];
-      d["date"] = new Date(d["date"]);
-      d["ratio"] = +d["ratio"];
-      return d;
-    }).then(setData);
-  }, [mutFreqUrl]);
-  return data;
-}
-;
-
-/***/ }),
-
-/***/ "./websrc/mutantMap/MutantNode.js":
+/***/ "./websrc/components/MutantMap.js":
 /*!****************************************!*\
-  !*** ./websrc/mutantMap/MutantNode.js ***!
+  !*** ./websrc/components/MutantMap.js ***!
   \****************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MutantNode": () => (/* binding */ MutantNode)
+/* harmony export */   "MutantMap": () => (/* binding */ MutantMap)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
@@ -594,28 +261,73 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-
-function MutantNode(_ref) {
-  var landscapeData = _ref.landscapeData,
+var margin = {
+  top: 40,
+  right: 40,
+  bottom: 40,
+  left: 40
+};
+var maxNodeSize = 100;
+function MutantMap(_ref) {
+  var landscapeMap = _ref.landscapeMap,
       mutColorScale = _ref.mutColorScale,
-      xScale = _ref.xScale,
-      yScales = _ref.yScales,
-      nodeSizeScale = _ref.nodeSizeScale,
-      hoveredMut = _ref.hoveredMut;
-  return Array.from(landscapeData).map(function (_ref2) {
-    var _ref3 = _slicedToArray(_ref2, 2),
-        mutSetId = _ref3[0],
-        mutSetNode = _ref3[1];
+      width = _ref.width,
+      height = _ref.height,
+      hoveredMut = _ref.hoveredMut,
+      brushExtent = _ref.brushExtent;
+  var innerWidth = width - margin.left - margin.right;
+  var innerHeight = height - margin.top - margin.bottom;
 
-    var _mutSetNode$setCoord$ = mutSetNode.setCoord(xScale, yScales).getCoord(),
-        _mutSetNode$setCoord$2 = _slicedToArray(_mutSetNode$setCoord$, 2),
-        x = _mutSetNode$setCoord$2[0],
-        y = _mutSetNode$setCoord$2[1];
+  if (brushExtent) {
+    landscapeMap.setDateRange(brushExtent);
+  } else {
+    landscapeMap.resetRenderPrep();
+  }
+
+  ;
+
+  var _landscapeMap$getStar = landscapeMap.getStartEndIndex(),
+      _landscapeMap$getStar2 = _slicedToArray(_landscapeMap$getStar, 2),
+      startIndex = _landscapeMap$getStar2[0],
+      endIndex = _landscapeMap$getStar2[1];
+
+  var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([startIndex, endIndex]).range([0, innerWidth]);
+  var nodeSizeScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleSqrt)().domain([0, landscapeMap.maxRatioSum]).range([0, maxNodeSize]);
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+    transform: "translate(".concat(margin.left, ", ").concat(margin.top, ")")
+  }, landscapeMap.data.map(function (laneData, laneIndex) {
+    var yScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, laneData.length + 1]).range([innerHeight, 0]);
+    return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(MutantLane, {
+      key: "lane_".concat(laneIndex),
+      laneData: laneData,
+      mutColorScale: mutColorScale,
+      xScale: xScale,
+      yScale: yScale,
+      nodeSizeScale: nodeSizeScale,
+      hoveredMut: hoveredMut
+    });
+  }));
+}
+;
+
+function MutantLane(_ref2) {
+  var laneData = _ref2.laneData,
+      mutColorScale = _ref2.mutColorScale,
+      xScale = _ref2.xScale,
+      yScale = _ref2.yScale,
+      nodeSizeScale = _ref2.nodeSizeScale,
+      hoveredMut = _ref2.hoveredMut;
+  return laneData.map(function (mutSetNode, nodeIndex) {
+    var x = xScale(mutSetNode.parentLinks.length);
+    var y = yScale(nodeIndex + 1);
+    mutSetNode.setCoord(x, y);
 
     if (mutSetNode.ratioSum === 0) {
       return undefined;
     }
 
+    ;
+    var mutSetId = mutSetNode.id;
     var mutIncreValues = [];
     var pieRadius = nodeSizeScale(mutSetNode.ratioSum);
     var arcScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.arc)().innerRadius(0).outerRadius(pieRadius);
@@ -624,10 +336,10 @@ function MutantNode(_ref) {
     });
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
       key: mutSetId
-    }, mutSetNode.parentLinks.map(function (_ref4) {
-      var _ref5 = _slicedToArray(_ref4, 2),
-          parent = _ref5[0],
-          mut = _ref5[1];
+    }, mutSetNode.parentLinks.map(function (_ref3) {
+      var _ref4 = _slicedToArray(_ref3, 2),
+          parent = _ref4[0],
+          mut = _ref4[1];
 
       var mutName = _utils__WEBPACK_IMPORTED_MODULE_2__.mutationName.apply(void 0, _toConsumableArray(mut));
       var ratioDiff = mutSetNode.ratioSum - parent.ratioSum;
@@ -647,10 +359,10 @@ function MutantNode(_ref) {
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, "Mutation: ".concat(mutName)));
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
       transform: "translate(".concat(x, ", ").concat(y, ")")
-    }, pieScale(mutIncreValues).map(function (_ref6) {
-      var data = _ref6.data,
-          startAngle = _ref6.startAngle,
-          endAngle = _ref6.endAngle;
+    }, pieScale(mutIncreValues).map(function (_ref5) {
+      var data = _ref5.data,
+          startAngle = _ref5.startAngle,
+          endAngle = _ref5.endAngle;
       var mutName = data["mutName"];
       var pieArcColor = mutColorScale(mutName);
       var arcPathGen = arcScale.startAngle(startAngle).endAngle(endAngle);
@@ -673,79 +385,476 @@ function MutantNode(_ref) {
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, mutSetNode.getMutName())));
   });
 }
+
 ;
 
 /***/ }),
 
-/***/ "./websrc/mutantMap/index.js":
-/*!***********************************!*\
-  !*** ./websrc/mutantMap/index.js ***!
-  \***********************************/
+/***/ "./websrc/components/index.js":
+/*!************************************!*\
+  !*** ./websrc/components/index.js ***!
+  \************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "MutantMap": () => (/* binding */ MutantMap)
+/* harmony export */   "ColorLegend": () => (/* reexport safe */ _ColorLegend__WEBPACK_IMPORTED_MODULE_0__.ColorLegend),
+/* harmony export */   "DateGraph": () => (/* reexport safe */ _DateGraph__WEBPACK_IMPORTED_MODULE_1__.DateGraph),
+/* harmony export */   "MutantMap": () => (/* reexport safe */ _MutantMap__WEBPACK_IMPORTED_MODULE_2__.MutantMap)
+/* harmony export */ });
+/* harmony import */ var _ColorLegend__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ColorLegend */ "./websrc/components/ColorLegend.js");
+/* harmony import */ var _DateGraph__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./DateGraph */ "./websrc/components/DateGraph.js");
+/* harmony import */ var _MutantMap__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MutantMap */ "./websrc/components/MutantMap.js");
+
+
+
+
+/***/ }),
+
+/***/ "./websrc/loadData/index.js":
+/*!**********************************!*\
+  !*** ./websrc/loadData/index.js ***!
+  \**********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "useData": () => (/* reexport safe */ _useData__WEBPACK_IMPORTED_MODULE_0__.useData)
+/* harmony export */ });
+/* harmony import */ var _useData__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./useData */ "./websrc/loadData/useData.js");
+
+
+/***/ }),
+
+/***/ "./websrc/loadData/processData.js":
+/*!****************************************!*\
+  !*** ./websrc/loadData/processData.js ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "parseData": () => (/* binding */ parseData)
+/* harmony export */ });
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./websrc/utils/index.js");
+function _toArray(arr) { return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest(); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _classPrivateMethodInitSpec(obj, privateSet) { _checkPrivateRedeclaration(obj, privateSet); privateSet.add(obj); }
+
+function _classPrivateMethodGet(receiver, privateSet, fn) { if (!privateSet.has(receiver)) { throw new TypeError("attempted to get private field on non-instance"); } return fn; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); Object.defineProperty(Constructor, "prototype", { writable: false }); return Constructor; }
+
+function _classPrivateFieldInitSpec(obj, privateMap, value) { _checkPrivateRedeclaration(obj, privateMap); privateMap.set(obj, value); }
+
+function _checkPrivateRedeclaration(obj, privateCollection) { if (privateCollection.has(obj)) { throw new TypeError("Cannot initialize the same private elements twice on an object"); } }
+
+function _classPrivateFieldGet(receiver, privateMap) { var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "get"); return _classApplyDescriptorGet(receiver, descriptor); }
+
+function _classApplyDescriptorGet(receiver, descriptor) { if (descriptor.get) { return descriptor.get.call(receiver); } return descriptor.value; }
+
+function _classPrivateFieldSet(receiver, privateMap, value) { var descriptor = _classExtractFieldDescriptor(receiver, privateMap, "set"); _classApplyDescriptorSet(receiver, descriptor, value); return value; }
+
+function _classExtractFieldDescriptor(receiver, privateMap, action) { if (!privateMap.has(receiver)) { throw new TypeError("attempted to " + action + " private field on non-instance"); } return privateMap.get(receiver); }
+
+function _classApplyDescriptorSet(receiver, descriptor, value) { if (descriptor.set) { descriptor.set.call(receiver, value); } else { if (!descriptor.writable) { throw new TypeError("attempted to set read only private field"); } descriptor.value = value; } }
+
+
+
+var MUT_INFO_LEN = 4;
+
+var _defaultRatioSum = /*#__PURE__*/new WeakMap();
+
+var LandscapeNode = /*#__PURE__*/function () {
+  function LandscapeNode(id, parentLinks, dailyRatio, ratioSum) {
+    _classCallCheck(this, LandscapeNode);
+
+    _classPrivateFieldInitSpec(this, _defaultRatioSum, {
+      writable: true,
+      value: void 0
+    });
+
+    this.id = id;
+    this.parentLinks = parentLinks;
+    this.dailyRatio = dailyRatio;
+
+    _classPrivateFieldSet(this, _defaultRatioSum, ratioSum);
+  }
+
+  _createClass(LandscapeNode, [{
+    key: "setCoord",
+    value: function setCoord(x, y) {
+      this.x = x;
+      this.y = y;
+      return this;
+    }
+  }, {
+    key: "getCoord",
+    value: function getCoord() {
+      return [this.x, this.y];
+    }
+  }, {
+    key: "resetDateRange",
+    value: function resetDateRange() {
+      this.ratioSum = _classPrivateFieldGet(this, _defaultRatioSum);
+      return this;
+    }
+  }, {
+    key: "setDateRange",
+    value: function setDateRange(startDate, endDate) {
+      this.ratioSum = 0;
+
+      for (var i = 0; i < this.dailyRatio.length; i++) {
+        var currDate = this.dailyRatio[i]["date"];
+
+        if (currDate >= startDate && currDate <= endDate) {
+          this.ratioSum += this.dailyRatio[i]["ratio"];
+        }
+
+        ;
+      }
+
+      ;
+      return this;
+    }
+  }, {
+    key: "getMutName",
+    value: function getMutName() {
+      return this.parentLinks.map(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            _ref2$ = _slicedToArray(_ref2[1], 3),
+            p = _ref2$[0],
+            n = _ref2$[1],
+            s = _ref2$[2];
+
+        return (0,_utils__WEBPACK_IMPORTED_MODULE_1__.mutationName)(p, n, s);
+      }).join(", ");
+    }
+  }]);
+
+  return LandscapeNode;
+}();
+
+;
+
+var _defaultStartIndex = /*#__PURE__*/new WeakMap();
+
+var _defaultEndIndex = /*#__PURE__*/new WeakMap();
+
+var _defaultMaxRatioSum = /*#__PURE__*/new WeakMap();
+
+var _findStartEndIndex = /*#__PURE__*/new WeakSet();
+
+var LandscapeMap = /*#__PURE__*/function () {
+  function LandscapeMap(data, startIndex, endIndex, maxRatioSum) {
+    _classCallCheck(this, LandscapeMap);
+
+    _classPrivateMethodInitSpec(this, _findStartEndIndex);
+
+    _classPrivateFieldInitSpec(this, _defaultStartIndex, {
+      writable: true,
+      value: void 0
+    });
+
+    _classPrivateFieldInitSpec(this, _defaultEndIndex, {
+      writable: true,
+      value: void 0
+    });
+
+    _classPrivateFieldInitSpec(this, _defaultMaxRatioSum, {
+      writable: true,
+      value: void 0
+    });
+
+    this.data = data;
+
+    _classPrivateFieldSet(this, _defaultStartIndex, startIndex);
+
+    _classPrivateFieldSet(this, _defaultEndIndex, endIndex);
+
+    _classPrivateFieldSet(this, _defaultMaxRatioSum, maxRatioSum);
+
+    this.resetRenderPrep();
+  }
+
+  _createClass(LandscapeMap, [{
+    key: "getStartEndIndex",
+    value: function getStartEndIndex() {
+      return [this.startIndex, this.endIndex];
+    }
+  }, {
+    key: "resetRenderPrep",
+    value: function resetRenderPrep() {
+      this.startIndex = _classPrivateFieldGet(this, _defaultStartIndex);
+      this.endIndex = _classPrivateFieldGet(this, _defaultEndIndex);
+      this.maxRatioSum = _classPrivateFieldGet(this, _defaultMaxRatioSum);
+      this.data.map(function (laneData) {
+        laneData.forEach(function (mutSetNode) {
+          mutSetNode.resetDateRange();
+        });
+      });
+      return this;
+    }
+  }, {
+    key: "setDateRange",
+    value: function setDateRange(dateRange) {
+      this.data.map(function (laneData) {
+        var laneRatioSum = 0;
+        laneData.forEach(function (mutSetNode) {
+          mutSetNode.setDateRange.apply(mutSetNode, _toConsumableArray(dateRange));
+          laneRatioSum += mutSetNode.ratioSum;
+        });
+      });
+      return this;
+    }
+  }, {
+    key: "setMutationsAndDateRange",
+    value: function setMutationsAndDateRange(mutations, dateRange) {
+      var _this = this;
+
+      this.startIndex = null;
+      this.endIndex = null;
+      this.data.map(function (laneData, index) {
+        var laneRatioSum = 0;
+        laneData.forEach(function (mutSetNode) {
+          mutSetNode.setDateRange.apply(mutSetNode, _toConsumableArray(dateRange));
+          laneRatioSum += mutSetNode.ratioSum;
+        });
+
+        _classPrivateMethodGet(_this, _findStartEndIndex, _findStartEndIndex2).call(_this, laneRatioSum, index);
+      });
+      return this;
+    }
+  }]);
+
+  return LandscapeMap;
+}();
+
+function _findStartEndIndex2(laneRatioSum, index) {
+  if (laneRatioSum && this.startIndex === null) {
+    this.startIndex = index;
+  }
+
+  ;
+
+  if (!laneRatioSum && this.startIndex !== null && this.endIndex === null) {
+    this.endIndex = index;
+  }
+
+  ;
+}
+
+;
+function parseData(mutantNode, mutantFreq) {
+  var groupedMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.group)(mutantFreq, function (d) {
+    return d["mut_set_id"];
+  });
+  var mutFreq = [];
+  var landscapeData = [];
+  var laneData = [];
+  var prevLaneData = new Map();
+  var laneRatioSum = 0,
+      laneIndex = -1,
+      startIndex = null,
+      endIndex = null;
+  var prevMutLinkLength = -1;
+  var maxRatioSum = -1;
+
+  function findStartEndIndex() {
+    if (laneRatioSum && startIndex === null) {
+      startIndex = laneIndex;
+    }
+
+    ;
+
+    if (!laneRatioSum && startIndex !== null && endIndex === null) {
+      endIndex = laneIndex;
+    }
+
+    ;
+    return [++laneIndex, startIndex, endIndex, 0];
+  }
+
+  mutantNode.forEach(function (_ref3) {
+    var _ref4 = _toArray(_ref3),
+        mutSetId = _ref4[0],
+        mutLink = _ref4.slice(1);
+
+    var dailyRatio = groupedMutFreq.get(mutSetId) || [];
+    var parentLinks = [];
+
+    for (var i = 0; i < mutLink.length; i += MUT_INFO_LEN) {
+      var _mutLink$slice = mutLink.slice(i, i + MUT_INFO_LEN),
+          _mutLink$slice2 = _toArray(_mutLink$slice),
+          parentId = _mutLink$slice2[0],
+          mut = _mutLink$slice2.slice(1);
+
+      parentLinks.push([prevLaneData.get(parentId), mut]);
+
+      for (var j = 0; j < dailyRatio.length; j++) {
+        mutFreq.push({
+          "mut": _utils__WEBPACK_IMPORTED_MODULE_1__.mutationName.apply(void 0, _toConsumableArray(mut)),
+          "date": dailyRatio[j]["date"],
+          "ratio": dailyRatio[j]["ratio"]
+        });
+      }
+
+      ;
+    }
+
+    ;
+
+    if (mutLink.length > prevMutLinkLength) {
+      landscapeData.push(laneData);
+      laneData = []; // Decide start and end index based on laneRatioSum of each lane
+
+      var _findStartEndIndex3 = findStartEndIndex();
+
+      var _findStartEndIndex4 = _slicedToArray(_findStartEndIndex3, 4);
+
+      laneIndex = _findStartEndIndex4[0];
+      startIndex = _findStartEndIndex4[1];
+      endIndex = _findStartEndIndex4[2];
+      laneRatioSum = _findStartEndIndex4[3];
+    }
+
+    ;
+    var ratioSum = (0,d3__WEBPACK_IMPORTED_MODULE_0__.sum)(dailyRatio, function (d) {
+      return d["ratio"];
+    });
+    laneRatioSum += ratioSum;
+
+    if (ratioSum > maxRatioSum) {
+      maxRatioSum = ratioSum;
+    }
+
+    ;
+    var mutSetNode = new LandscapeNode(mutSetId, parentLinks, dailyRatio, ratioSum);
+    prevLaneData.set(mutSetId, mutSetNode);
+    laneData.push(mutSetNode);
+    prevMutLinkLength = mutLink.length;
+  });
+  landscapeData.push(laneData);
+  landscapeData.shift(); // Decide start and end index based on laneRatioSum of each lane
+
+  var _findStartEndIndex5 = findStartEndIndex();
+
+  var _findStartEndIndex6 = _slicedToArray(_findStartEndIndex5, 4);
+
+  laneIndex = _findStartEndIndex6[0];
+  startIndex = _findStartEndIndex6[1];
+  endIndex = _findStartEndIndex6[2];
+  laneRatioSum = _findStartEndIndex6[3];
+  var landscapeMap = new LandscapeMap(landscapeData, startIndex, endIndex, maxRatioSum);
+  var dailyMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.flatGroup)(mutFreq, function (d) {
+    return d["mut"];
+  }, function (d) {
+    return d["date"];
+  }).map(function (_ref5) {
+    var _ref6 = _slicedToArray(_ref5, 3),
+        n = _ref6[0],
+        d = _ref6[1],
+        ratio = _ref6[2];
+
+    return {
+      "mut": n,
+      "date": d,
+      "ratio": (0,d3__WEBPACK_IMPORTED_MODULE_0__.sum)(ratio, function (r) {
+        return r["ratio"];
+      })
+    };
+  });
+  var dateRange = (0,d3__WEBPACK_IMPORTED_MODULE_0__.extent)(dailyMutFreq, function (d) {
+    return d["date"];
+  });
+  var mutDailyFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.group)(dailyMutFreq, function (d) {
+    return d["mut"];
+  });
+  return [landscapeMap, mutDailyFreq, dateRange];
+}
+;
+
+/***/ }),
+
+/***/ "./websrc/loadData/useData.js":
+/*!************************************!*\
+  !*** ./websrc/loadData/useData.js ***!
+  \************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "useData": () => (/* binding */ useData)
 /* harmony export */ });
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
-/* harmony import */ var _MutantNode__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MutantNode */ "./websrc/mutantMap/MutantNode.js");
+/* harmony import */ var _processData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./processData */ "./websrc/loadData/processData.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-var margin = {
-  top: 40,
-  right: 40,
-  bottom: 40,
-  left: 40
-};
-var maxNodeSize = 100;
-function MutantMap(_ref) {
-  var landscapeData = _ref.landscapeData,
-      laneLengths = _ref.laneLengths,
-      laneExist = _ref.laneExist,
-      mutColorScale = _ref.mutColorScale,
-      maxRatioSum = _ref.maxRatioSum,
-      width = _ref.width,
-      height = _ref.height,
-      hoveredMut = _ref.hoveredMut;
-  var innerWidth = width - margin.left - margin.right;
-  var innerHeight = height - margin.top - margin.bottom;
-  var yScales = laneLengths.map(function (l) {
-    return (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, l + 1]).range([innerHeight, 0]);
-  });
-  var startIndex = 0;
-  var endIndex = laneExist.length - 1;
 
-  for (; startIndex < endIndex; startIndex++) {
-    if (laneExist[startIndex]) {
-      break;
-    }
-  }
+var rawDataUrl = "https://gist.githubusercontent.com/Takkoona/854b54ed3148561f95e395350d16ff45/raw/4ad38d75214136e74b4b7bb7f614b42f25a27364";
+function useData() {
+  var mutNodeUrl = "".concat(rawDataUrl, "/USA_mut_node.json");
+  var mutFreqUrl = "".concat(rawDataUrl, "/USA_mut_freq.csv");
 
-  ;
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
+      _useState2 = _slicedToArray(_useState, 2),
+      data = _useState2[0],
+      setData = _useState2[1];
 
-  for (; endIndex >= startIndex; endIndex--) {
-    if (laneExist[endIndex]) {
-      break;
-    }
-  }
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    Promise.all([(0,d3__WEBPACK_IMPORTED_MODULE_1__.json)(mutNodeUrl), (0,d3__WEBPACK_IMPORTED_MODULE_1__.csv)(mutFreqUrl, function (d) {
+      d["mut_set_id"] = +d["mut_set_id"];
+      d["date"] = new Date(d["date"]);
+      d["ratio"] = +d["ratio"];
+      return d;
+    })]).then(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+          mutantNode = _ref2[0],
+          mutantFreq = _ref2[1];
 
-  ;
-  laneLengths = laneLengths.slice(startIndex, endIndex);
-  var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, laneLengths.length]).range([0, innerWidth]);
-  var nodeSizeScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleSqrt)().domain([0, maxRatioSum]).range([0, maxNodeSize]);
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
-    transform: "translate(".concat(margin.left, ", ").concat(margin.top, ")")
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_MutantNode__WEBPACK_IMPORTED_MODULE_2__.MutantNode, {
-    landscapeData: landscapeData,
-    mutColorScale: mutColorScale,
-    xScale: xScale,
-    yScales: yScales,
-    nodeSizeScale: nodeSizeScale,
-    hoveredMut: hoveredMut
-  }));
+      setData((0,_processData__WEBPACK_IMPORTED_MODULE_2__.parseData)(mutantNode, mutantFreq));
+    });
+  }, [mutNodeUrl, mutFreqUrl]);
+  return data;
 }
 ;
 
@@ -67719,9 +67828,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom_client__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom/client */ "./node_modules/react-dom/client.js");
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
 /* harmony import */ var _loadData__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./loadData */ "./websrc/loadData/index.js");
-/* harmony import */ var _mutantMap__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./mutantMap */ "./websrc/mutantMap/index.js");
-/* harmony import */ var _dateGraph__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./dateGraph */ "./websrc/dateGraph/index.js");
-/* harmony import */ var _colorLegend__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./colorLegend */ "./websrc/colorLegend/index.js");
+/* harmony import */ var _components__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./components */ "./websrc/components/index.js");
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -67733,8 +67840,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-
 
 
 
@@ -67767,6 +67872,11 @@ var App = function App() {
       hoveredMut = _useState6[0],
       setHoveredMut = _useState6[1];
 
+  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
+      _useState8 = _slicedToArray(_useState7, 2),
+      brushExtent = _useState8[0],
+      setBrushExtent = _useState8[1];
+
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     var handleResize = function handleResize() {
       setWidth(root.offsetWidth);
@@ -67778,7 +67888,7 @@ var App = function App() {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-  var data = (0,_loadData__WEBPACK_IMPORTED_MODULE_3__.LoadData)();
+  var data = (0,_loadData__WEBPACK_IMPORTED_MODULE_3__.useData)();
 
   if (!data) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("pre", null, "Loading...");
@@ -67786,45 +67896,38 @@ var App = function App() {
 
   ;
 
-  var _data = _slicedToArray(data, 6),
-      landscapeData = _data[0],
-      laneLengths = _data[1],
-      laneExist = _data[2],
-      dailyMutFreq = _data[3],
-      maxRatioSum = _data[4],
-      dateRange = _data[5];
+  var _data = _slicedToArray(data, 3),
+      landscapeMap = _data[0],
+      mutDailyFreq = _data[1],
+      dateRange = _data[2];
 
-  var mutDailyFreq = (0,d3__WEBPACK_IMPORTED_MODULE_2__.group)(dailyMutFreq, function (d) {
-    return d["mut"];
-  });
-  var mutColorScale = (0,d3__WEBPACK_IMPORTED_MODULE_2__.scaleOrdinal)().domain(mutDailyFreq.keys()).range(d3__WEBPACK_IMPORTED_MODULE_2__.schemeSet3);
+  var mutColorScale = (0,d3__WEBPACK_IMPORTED_MODULE_2__.scaleOrdinal)().domain(mutDailyFreq.keys()).range(d3__WEBPACK_IMPORTED_MODULE_2__.schemeSet1);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("svg", {
     width: width,
     height: height
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_dateGraph__WEBPACK_IMPORTED_MODULE_5__.DateGraph, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components__WEBPACK_IMPORTED_MODULE_4__.DateGraph, {
     mutDailyFreq: mutDailyFreq,
     mutColorScale: mutColorScale,
     dateRange: dateRange,
     width: width * dateGraphSpecs.w,
     height: height * dateGraphSpecs.h,
-    hoveredMut: hoveredMut
+    hoveredMut: hoveredMut,
+    setBrushExtent: setBrushExtent
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
     transform: "translate(".concat(width - 100, ", 20)")
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_colorLegend__WEBPACK_IMPORTED_MODULE_6__.ColorLegend, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components__WEBPACK_IMPORTED_MODULE_4__.ColorLegend, {
     mutColorScale: mutColorScale,
     hoveredMut: hoveredMut,
     setHoveredMut: setHoveredMut
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
     transform: "translate(0, ".concat(height * dateGraphSpecs.h, ")")
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_mutantMap__WEBPACK_IMPORTED_MODULE_4__.MutantMap, {
-    landscapeData: landscapeData,
-    laneLengths: laneLengths,
-    laneExist: laneExist,
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components__WEBPACK_IMPORTED_MODULE_4__.MutantMap, {
+    landscapeMap: landscapeMap,
     mutColorScale: mutColorScale,
-    maxRatioSum: maxRatioSum,
     width: width * landscapeSpecs.w,
     height: height * landscapeSpecs.h,
-    hoveredMut: hoveredMut
+    hoveredMut: hoveredMut,
+    brushExtent: brushExtent
   })));
 };
 
