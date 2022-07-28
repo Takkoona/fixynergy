@@ -14,13 +14,14 @@ const App = () => {
     const [width, setWidth] = useState(root.offsetWidth);
     const [height, setHeight] = useState(root.offsetHeight);
     const [hoveredMut, setHoveredMut] = useState(null);
+    const [selectedMuts, setSelectedMuts] = useState([]);
     const [brushExtent, setBrushExtent] = useState(null);
 
+    const handleResize = () => {
+        setWidth(root.offsetWidth);
+        setHeight(root.offsetHeight);
+    };
     useEffect(() => {
-        const handleResize = () => {
-            setWidth(root.offsetWidth);
-            setHeight(root.offsetHeight);
-        };
         window.addEventListener("resize", handleResize);
         return () => {
             window.removeEventListener("resize", handleResize);
@@ -35,6 +36,15 @@ const App = () => {
 
     return (
         <svg width={width} height={height}>
+            <g transform={`translate(${width - 100}, 20)`}>
+                <ColorLegend
+                    mutColorScale={mutColorScale}
+                    hoveredMut={hoveredMut}
+                    setHoveredMut={setHoveredMut}
+                    selectedMuts={selectedMuts}
+                    setSelectedMuts={setSelectedMuts}
+                ></ColorLegend>
+            </g>
             <DateGraph
                 mutDailyFreq={mutDailyFreq}
                 mutColorScale={mutColorScale}
@@ -43,14 +53,8 @@ const App = () => {
                 height={height * dateGraphSpecs.h}
                 hoveredMut={hoveredMut}
                 setBrushExtent={setBrushExtent}
+                selectedMuts={selectedMuts}
             ></DateGraph>
-            <g transform={`translate(${width - 100}, 20)`}>
-                <ColorLegend
-                    mutColorScale={mutColorScale}
-                    hoveredMut={hoveredMut}
-                    setHoveredMut={setHoveredMut}
-                ></ColorLegend>
-            </g>
             <g transform={`translate(0, ${height * dateGraphSpecs.h})`}>
                 <MutantMap
                     landscapeMap={landscapeMap}
@@ -59,6 +63,7 @@ const App = () => {
                     height={height * landscapeSpecs.h}
                     hoveredMut={hoveredMut}
                     brushExtent={brushExtent}
+                    selectedMuts={selectedMuts}
                 ></MutantMap>
             </g>
         </svg>

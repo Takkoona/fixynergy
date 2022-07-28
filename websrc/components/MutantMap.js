@@ -2,7 +2,7 @@ import React from "react";
 import { scaleLinear, scaleSqrt, max, pie, arc } from "d3";
 import { mutationName, setMutOpacity } from "../utils";
 
-const margin = { top: 40, right: 40, bottom: 40, left: 40 }
+const margin = { top: 40, right: 200, bottom: 40, left: 40 }
 const maxNodeSize = 100;
 
 export function MutantMap({
@@ -11,7 +11,8 @@ export function MutantMap({
     width,
     height,
     hoveredMut,
-    brushExtent
+    brushExtent,
+    selectedMuts
 }) {
 
     const innerWidth = width - margin.left - margin.right;
@@ -20,11 +21,15 @@ export function MutantMap({
     if (brushExtent) {
         landscapeMap.setDateRange(brushExtent);
     } else {
-        landscapeMap.resetRenderPrep();
+        landscapeMap.resetDateRange();
     };
-
+    if (selectedMuts.length) {
+        landscapeMap.setMutSelection([], selectedMuts);
+    } else {
+        landscapeMap.resetMutSelection();
+    };
     const [startIndex, endIndex] = landscapeMap.getStartEndIndex();
-    const xScale = scaleLinear().domain([startIndex, endIndex]).range([0, innerWidth]);
+    const xScale = scaleLinear().domain([startIndex, endIndex - 1]).range([0, innerWidth]);
     const nodeSizeScale = scaleSqrt().domain([0, landscapeMap.maxRatioSum]).range([0, maxNodeSize]);
 
     return (
@@ -40,6 +45,7 @@ export function MutantMap({
                         yScale={yScale}
                         nodeSizeScale={nodeSizeScale}
                         hoveredMut={hoveredMut}
+                        selectedMuts={selectedMuts}
                     ></MutantLane>
                 )
             })}
@@ -53,7 +59,8 @@ function MutantLane({
     xScale,
     yScale,
     nodeSizeScale,
-    hoveredMut
+    hoveredMut,
+    selectedMuts
 }) {
     return laneData.map((mutSetNode, nodeIndex) => {
         const x = xScale(mutSetNode.parentLinks.length);
@@ -79,7 +86,13 @@ function MutantLane({
                             x2={x}
                             y2={y}
                             strokeWidth="1"
-                            opacity={setMutOpacity(hoveredMut, mutName, 0, max([ratioDiff, 0]))}
+                            opacity={setMutOpacity(
+                                hoveredMut,
+                                mutName,
+                                selectedMuts,
+                                0,
+                                max([ratioDiff, 0])
+                            )}
                             stroke={mutColorScale(mutName)}
                         >
                             <title>{`Mutation: ${mutName}`}</title>
@@ -100,9 +113,19 @@ function MutantLane({
                                 key={`${mutSetId}${mutName}_pie`}
                                 d={arcPathGen()}
                                 fill={pieArcColor}
-                                fillOpacity={setMutOpacity(hoveredMut, mutName, 0.05, 0.5)}
+                                fillOpacity={setMutOpacity(
+                                    hoveredMut,
+                                    mutName,
+                                    selectedMuts,
+                                    0.05,
+                                    0.5
+                                )}
                                 stroke={pieArcColor}
-                                strokeOpacity={setMutOpacity(hoveredMut, mutName)}
+                                strokeOpacity={setMutOpacity(
+                                    hoveredMut,
+                                    mutName,
+                                    selectedMuts
+                                )}
                             >
                                 <title>{data["mutName"]}</title>
                             </path>

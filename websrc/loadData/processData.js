@@ -9,10 +9,11 @@ class LandscapeNode {
 
     constructor(id, parentLinks, dailyRatio, ratioSum) {
         this.id = id;
-        this.parentLinks = parentLinks;
         this.dailyRatio = dailyRatio;
+        this.parentLinks = parentLinks;
         this.#defaultRatioSum = ratioSum;
     };
+    getDefaultRatioSum() { return this.#defaultRatioSum; };
     setCoord(x, y) {
         this.x = x;
         this.y = y;
@@ -33,30 +34,41 @@ class LandscapeNode {
         };
         return this;
     };
+    setMutSelection(startingMuts, selectedMuts) {
+        let mutantNames = [];
+        for (let i = 0; i < this.parentLinks.length; i++) {
+            const [, [p, n, s]] = this.parentLinks[i];
+            const mutName = mutationName(p, n, s);
+            if (!selectedMuts.includes(mutName)) {
+                return false;
+            };
+            mutantNames.push(mutName);
+        };
+        return startingMuts.every(mut => mutantNames.includes(mut));
+    };
     getMutName() {
-        return this.parentLinks.map(([, [p, n, s]]) => mutationName(p, n, s)).join(", ");
+        return this.parentLinks.map(([, [p, n, s]]) => {
+            return mutationName(p, n, s);
+        }).join(", ");
     };
 };
 
 class LandscapeMap {
 
+    #defaultData;
     #defaultStartIndex;
     #defaultEndIndex;
-    #defaultMaxRatioSum;
 
     constructor(data, startIndex, endIndex, maxRatioSum) {
-        this.data = data;
+        this.#defaultData = data;
         this.#defaultStartIndex = startIndex;
         this.#defaultEndIndex = endIndex
-        this.#defaultMaxRatioSum = maxRatioSum;
-        this.resetRenderPrep();
+        this.maxRatioSum = maxRatioSum;
+        this.resetMutSelection();
     };
     getStartEndIndex() { return [this.startIndex, this.endIndex]; };
-    resetRenderPrep() {
-        this.startIndex = this.#defaultStartIndex;
-        this.endIndex = this.#defaultEndIndex;
-        this.maxRatioSum = this.#defaultMaxRatioSum;
-        this.data.map(laneData => {
+    resetDateRange() {
+        this.data.forEach(laneData => {
             laneData.forEach(mutSetNode => {
                 mutSetNode.resetDateRange();
             });
@@ -64,37 +76,65 @@ class LandscapeMap {
         return this;
     };
     setDateRange(dateRange) {
-        this.data.map(laneData => {
-            let laneRatioSum = 0;
+        this.data.forEach(laneData => {
             laneData.forEach(mutSetNode => {
                 mutSetNode.setDateRange(...dateRange);
-                laneRatioSum += mutSetNode.ratioSum;
             });
         });
         return this;
     };
-    setMutationsAndDateRange(mutations, dateRange) {
-        this.startIndex = null;
-        this.endIndex = null;
-        this.data.map((laneData, index) => {
-            let laneRatioSum = 0;
-            laneData.forEach(mutSetNode => {
-                mutSetNode.setDateRange(...dateRange);
-                laneRatioSum += mutSetNode.ratioSum;
-            });
-            this.#findStartEndIndex(laneRatioSum, index);
-        });
+    resetMutSelection() {
+        this.startIndex = this.#defaultStartIndex;
+        this.endIndex = this.#defaultEndIndex;
+        this.data = this.#defaultData;
         return this;
     };
-    #findStartEndIndex(laneRatioSum, index) {
+    setMutSelection(startingMuts, selectedMuts) {
+        const laneTracker = new LaneInfoTracker();
+        this.data = this.#defaultData.map((laneData, laneIndex) => {
+            const nodesToKeep = [];
+            let laneRatioSum = 0;
+            laneData.forEach(mutSetNode => {
+                if (mutSetNode.setMutSelection(
+                    startingMuts,
+                    selectedMuts
+                )) {
+                    nodesToKeep.push(mutSetNode);
+                    laneRatioSum += mutSetNode.getDefaultRatioSum();
+                };
+            });
+            laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
+            return nodesToKeep;
+        });
+        this.startIndex = laneTracker.startIndex;
+        this.endIndex = laneTracker.endIndex;
+        return this;
+    };
+    #setStartEndIndex(laneIndex, laneRatioSum) {
         if (laneRatioSum && this.startIndex === null) {
-            this.startIndex = index;
+            this.startIndex = laneIndex;
         };
         if (!laneRatioSum && this.startIndex !== null && this.endIndex === null) {
-            this.endIndex = index;
+            this.endIndex = laneIndex;
         };
     };
 };
+
+class LaneInfoTracker {
+    // This can be integrated into class LandscapeMap
+    constructor() {
+        this.startIndex = null;
+        this.endIndex = null;
+    };
+    findStartEndIndex(laneIndex, laneRatioSum) {
+        if (laneRatioSum && this.startIndex === null) {
+            this.startIndex = laneIndex;
+        };
+        if (!laneRatioSum && this.startIndex !== null && this.endIndex === null) {
+            this.endIndex = laneIndex;
+        };
+    };
+}
 
 export function parseData(mutantNode, mutantFreq) {
     const groupedMutFreq = group(mutantFreq, d => d["mut_set_id"]);
@@ -102,19 +142,10 @@ export function parseData(mutantNode, mutantFreq) {
     const landscapeData = [];
     let laneData = [];
     const prevLaneData = new Map();
-    let laneRatioSum = 0, laneIndex = -1, startIndex = null, endIndex = null;
+    let laneRatioSum = 0, laneIndex = -1;
+    const laneTracker = new LaneInfoTracker();
     let prevMutLinkLength = -1;
     let maxRatioSum = -1;
-
-    function findStartEndIndex() {
-        if (laneRatioSum && startIndex === null) {
-            startIndex = laneIndex;
-        };
-        if (!laneRatioSum && startIndex !== null && endIndex === null) {
-            endIndex = laneIndex;
-        };
-        return [++laneIndex, startIndex, endIndex, 0];
-    }
 
     mutantNode.forEach(([mutSetId, ...mutLink]) => {
         const dailyRatio = groupedMutFreq.get(mutSetId) || [];
@@ -133,8 +164,9 @@ export function parseData(mutantNode, mutantFreq) {
         if (mutLink.length > prevMutLinkLength) {
             landscapeData.push(laneData);
             laneData = [];
-            // Decide start and end index based on laneRatioSum of each lane
-            [laneIndex, startIndex, endIndex, laneRatioSum] = findStartEndIndex();
+            laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
+            laneIndex++;
+            laneRatioSum = 0;
         };
         const ratioSum = sum(dailyRatio, d => d["ratio"]);
         laneRatioSum += ratioSum;
@@ -152,11 +184,11 @@ export function parseData(mutantNode, mutantFreq) {
     landscapeData.push(laneData);
     landscapeData.shift();
     // Decide start and end index based on laneRatioSum of each lane
-    [laneIndex, startIndex, endIndex, laneRatioSum] = findStartEndIndex();
+    laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
     const landscapeMap = new LandscapeMap(
         landscapeData,
-        startIndex,
-        endIndex,
+        laneTracker.startIndex,
+        laneTracker.endIndex,
         maxRatioSum
     );
     const dailyMutFreq = flatGroup(
@@ -164,7 +196,11 @@ export function parseData(mutantNode, mutantFreq) {
         d => d["mut"],
         d => d["date"]
     ).map(([n, d, ratio]) => {
-        return { "mut": n, "date": d, "ratio": sum(ratio, r => r["ratio"]) };
+        return {
+            "mut": n,
+            "date": d,
+            "ratio": sum(ratio, r => r["ratio"])
+        };
     });
     const dateRange = extent(dailyMutFreq, d => d["date"]);
     const mutDailyFreq = group(dailyMutFreq, d => d["mut"]);

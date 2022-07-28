@@ -18,14 +18,15 @@ export function DateGraph({
     width,
     height,
     hoveredMut,
-    setBrushExtent
+    setBrushExtent,
+    selectedMuts,
 }) {
 
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
-    
+
     const brushRef = useRef();
-    
+
     const xScale = scaleTime().domain(dateRange).range([0, innerWidth]);
     const yScale = scaleLinear().domain([0, 1]).range([innerHeight, 0]);
 
@@ -45,6 +46,7 @@ export function DateGraph({
                 yScale={yScale}
                 colorScale={mutColorScale}
                 hoveredMut={hoveredMut}
+                selectedMuts={selectedMuts}
             ></DotMarks>
             <AxisBottom
                 xScale={xScale}
@@ -102,29 +104,24 @@ function DotMarks({
     xScale,
     yScale,
     colorScale,
-    hoveredMut
+    hoveredMut,
+    selectedMuts,
 }) {
     return Array.from(groupedData).map(([mut, data]) => {
+        if (selectedMuts.length !== 0 && !selectedMuts.includes(mut)) {
+            return undefined;
+        }
         const linePath = line().x(d => xScale(xValue(d))).y(d => yScale(yValue(d)));
         data = data.sort((a, b) => xValue(a) - xValue(b));
         return (
-            <g key={mut} opacity={setMutOpacity(hoveredMut, mut)}>
+            <g key={mut} opacity={setMutOpacity(hoveredMut, mut, selectedMuts)}>
                 <path
                     key={`${mut}line`}
                     fill="none"
                     stroke={colorScale(mut)}
+                    strokeWidth="2"
                     d={linePath(data)}
                 ></path>
-                {data.map(d => (
-                    <circle
-                        key={`${d["mut"]}${xAxisTickFormat(xValue(d))}`}
-                        cx={xScale(xValue(d))}
-                        cy={yScale(yValue(d))}
-                        r="2"
-                        fill={colorScale(mut)}
-                        opacity={setMutOpacity(hoveredMut, mut)}
-                    ></circle>
-                ))}
             </g>
         )
     });
