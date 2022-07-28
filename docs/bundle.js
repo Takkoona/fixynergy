@@ -22,7 +22,9 @@ var tickSize = 5;
 function ColorLegend(_ref) {
   var mutColorScale = _ref.mutColorScale,
       hoveredMut = _ref.hoveredMut,
-      setHoveredMut = _ref.setHoveredMut;
+      setHoveredMut = _ref.setHoveredMut,
+      selectedMuts = _ref.selectedMuts,
+      setSelectedMuts = _ref.setSelectedMuts;
   return mutColorScale.domain().map(function (mutName, i) {
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
       key: "".concat(mutName, "_legend"),
@@ -33,7 +35,21 @@ function ColorLegend(_ref) {
       onMouseOut: function onMouseOut() {
         setHoveredMut(null);
       },
-      opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_1__.setMutOpacity)(hoveredMut, mutName)
+      onClick: function onClick() {
+        setSelectedMuts(function (prevSelectedMut) {
+          var mutNameIndex = prevSelectedMut.indexOf(mutName);
+
+          if (mutNameIndex === -1) {
+            prevSelectedMut.push(mutName);
+          } else {
+            prevSelectedMut.splice(mutNameIndex, 1);
+          }
+
+          ;
+          return prevSelectedMut;
+        });
+      },
+      opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_1__.setMutOpacity)(hoveredMut, mutName, selectedMuts)
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
       fill: mutColorScale(mutName),
       r: tickSize
@@ -103,7 +119,8 @@ function DateGraph(_ref) {
       width = _ref.width,
       height = _ref.height,
       hoveredMut = _ref.hoveredMut,
-      setBrushExtent = _ref.setBrushExtent;
+      setBrushExtent = _ref.setBrushExtent,
+      selectedMuts = _ref.selectedMuts;
   var innerWidth = width - margin.left - margin.right;
   var innerHeight = height - margin.top - margin.bottom;
   var brushRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)();
@@ -123,7 +140,8 @@ function DateGraph(_ref) {
     xScale: xScale,
     yScale: yScale,
     colorScale: mutColorScale,
-    hoveredMut: hoveredMut
+    hoveredMut: hoveredMut,
+    selectedMuts: selectedMuts
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(AxisBottom, {
     xScale: xScale,
     innerHeight: innerHeight
@@ -187,11 +205,16 @@ function DotMarks(_ref4) {
       xScale = _ref4.xScale,
       yScale = _ref4.yScale,
       colorScale = _ref4.colorScale,
-      hoveredMut = _ref4.hoveredMut;
+      hoveredMut = _ref4.hoveredMut,
+      selectedMuts = _ref4.selectedMuts;
   return Array.from(groupedData).map(function (_ref5) {
     var _ref6 = _slicedToArray(_ref5, 2),
         mut = _ref6[0],
         data = _ref6[1];
+
+    if (selectedMuts.length !== 0 && !selectedMuts.includes(mut)) {
+      return undefined;
+    }
 
     var linePath = (0,d3__WEBPACK_IMPORTED_MODULE_1__.line)().x(function (d) {
       return xScale(xValue(d));
@@ -203,21 +226,13 @@ function DotMarks(_ref4) {
     });
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
       key: mut,
-      opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
+      opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut, selectedMuts)
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("path", {
       key: "".concat(mut, "line"),
       fill: "none",
       stroke: colorScale(mut),
+      strokeWidth: "2",
       d: linePath(data)
-    }), data.map(function (d) {
-      return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
-        key: "".concat(d["mut"]).concat(xAxisTickFormat(xValue(d))),
-        cx: xScale(xValue(d)),
-        cy: yScale(yValue(d)),
-        r: "2",
-        fill: colorScale(mut),
-        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mut)
-      });
     }));
   });
 }
@@ -263,25 +278,75 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 var margin = {
   top: 40,
-  right: 40,
+  right: 200,
   bottom: 40,
   left: 40
 };
-var maxNodeSize = 100;
+var defaultMaxNodeSize = 100;
+var nodeChangeSize = 20;
 function MutantMap(_ref) {
   var landscapeMap = _ref.landscapeMap,
       mutColorScale = _ref.mutColorScale,
       width = _ref.width,
       height = _ref.height,
       hoveredMut = _ref.hoveredMut,
-      brushExtent = _ref.brushExtent;
+      brushExtent = _ref.brushExtent,
+      selectedMuts = _ref.selectedMuts;
+
+  var _useState = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(defaultMaxNodeSize),
+      _useState2 = _slicedToArray(_useState, 2),
+      maxNodeSize = _useState2[0],
+      setMaxNodeSize = _useState2[1];
+
+  var mutatnMapRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
+    var handler = function handler(event) {
+      // event.preventDefault();
+      if (event.deltaY < 0) {
+        setMaxNodeSize(function (prevMaxNodeSize) {
+          return prevMaxNodeSize + nodeChangeSize;
+        });
+      }
+
+      if (event.deltaY > 0) {
+        setMaxNodeSize(function (prevMaxNodeSize) {
+          return prevMaxNodeSize - nodeChangeSize;
+        });
+      }
+
+      ;
+
+      if (event.ctrlKey) {
+        if (event.key === "0") {
+          setMaxNodeSize(defaultMaxNodeSize);
+        }
+      }
+    };
+
+    var element = mutatnMapRef.current;
+    element.addEventListener("wheel", handler);
+    document.addEventListener('keydown', handler);
+    return function () {
+      element.removeEventListener("wheel", handler);
+      document.removeEventListener('keydown', handler);
+    };
+  }, []); // console.log(maxNodeSize);
+
   var innerWidth = width - margin.left - margin.right;
   var innerHeight = height - margin.top - margin.bottom;
 
   if (brushExtent) {
     landscapeMap.setDateRange(brushExtent);
   } else {
-    landscapeMap.resetRenderPrep();
+    landscapeMap.resetDateRange();
+  }
+
+  ;
+
+  if (selectedMuts.length) {
+    landscapeMap.setMutSelection([], selectedMuts);
+  } else {
+    landscapeMap.resetMutSelection();
   }
 
   ;
@@ -291,11 +356,16 @@ function MutantMap(_ref) {
       startIndex = _landscapeMap$getStar2[0],
       endIndex = _landscapeMap$getStar2[1];
 
-  var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([startIndex, endIndex]).range([0, innerWidth]);
+  var xScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([startIndex, endIndex - 1]).range([0, innerWidth]);
   var nodeSizeScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleSqrt)().domain([0, landscapeMap.maxRatioSum]).range([0, maxNodeSize]);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
-    transform: "translate(".concat(margin.left, ", ").concat(margin.top, ")")
-  }, landscapeMap.data.map(function (laneData, laneIndex) {
+    transform: "translate(".concat(margin.left, ", ").concat(margin.top, ")"),
+    ref: mutatnMapRef
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("rect", {
+    width: innerWidth,
+    height: innerHeight,
+    fill: "white"
+  }), landscapeMap.data.map(function (laneData, laneIndex) {
     var yScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.scaleLinear)().domain([0, laneData.length + 1]).range([innerHeight, 0]);
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(MutantLane, {
       key: "lane_".concat(laneIndex),
@@ -304,7 +374,8 @@ function MutantMap(_ref) {
       xScale: xScale,
       yScale: yScale,
       nodeSizeScale: nodeSizeScale,
-      hoveredMut: hoveredMut
+      hoveredMut: hoveredMut,
+      selectedMuts: selectedMuts
     });
   }));
 }
@@ -316,7 +387,8 @@ function MutantLane(_ref2) {
       xScale = _ref2.xScale,
       yScale = _ref2.yScale,
       nodeSizeScale = _ref2.nodeSizeScale,
-      hoveredMut = _ref2.hoveredMut;
+      hoveredMut = _ref2.hoveredMut,
+      selectedMuts = _ref2.selectedMuts;
   return laneData.map(function (mutSetNode, nodeIndex) {
     var x = xScale(mutSetNode.parentLinks.length);
     var y = yScale(nodeIndex + 1);
@@ -354,7 +426,7 @@ function MutantLane(_ref2) {
         x2: x,
         y2: y,
         strokeWidth: "1",
-        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, 0, (0,d3__WEBPACK_IMPORTED_MODULE_1__.max)([ratioDiff, 0])),
+        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, selectedMuts, 0, (0,d3__WEBPACK_IMPORTED_MODULE_1__.max)([ratioDiff, 0])),
         stroke: mutColorScale(mutName)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, "Mutation: ".concat(mutName)));
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
@@ -370,10 +442,10 @@ function MutantLane(_ref2) {
         key: "".concat(mutSetId).concat(mutName, "_pie"),
         d: arcPathGen(),
         fill: pieArcColor,
-        fillOpacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, 0.05, 0.5),
+        fillOpacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, selectedMuts, 0.05, 0.5),
         stroke: pieArcColor,
-        strokeOpacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName)
-      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, data["mutName"]));
+        strokeOpacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, selectedMuts)
+      }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, "".concat(data["mutName"], " (").concat(mutSetNode.getMutName(), ")")));
     })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("circle", {
       key: mutSetId.toString() + "node",
       cx: x,
@@ -450,8 +522,6 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 
 function _classPrivateMethodInitSpec(obj, privateSet) { _checkPrivateRedeclaration(obj, privateSet); privateSet.add(obj); }
 
-function _classPrivateMethodGet(receiver, privateSet, fn) { if (!privateSet.has(receiver)) { throw new TypeError("attempted to get private field on non-instance"); } return fn; }
-
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -500,13 +570,18 @@ var LandscapeNode = /*#__PURE__*/function () {
     });
 
     this.id = id;
-    this.parentLinks = parentLinks;
     this.dailyRatio = dailyRatio;
+    this.parentLinks = parentLinks;
 
     _classPrivateFieldSet(this, _defaultRatioSum, ratioSum);
   }
 
   _createClass(LandscapeNode, [{
+    key: "getDefaultRatioSum",
+    value: function getDefaultRatioSum() {
+      return _classPrivateFieldGet(this, _defaultRatioSum);
+    }
+  }, {
     key: "setCoord",
     value: function setCoord(x, y) {
       this.x = x;
@@ -543,6 +618,33 @@ var LandscapeNode = /*#__PURE__*/function () {
       return this;
     }
   }, {
+    key: "setMutSelection",
+    value: function setMutSelection(startingMuts, selectedMuts) {
+      var mutantNames = [];
+
+      for (var i = 0; i < this.parentLinks.length; i++) {
+        var _this$parentLinks$i = _slicedToArray(this.parentLinks[i], 2),
+            _this$parentLinks$i$ = _slicedToArray(_this$parentLinks$i[1], 3),
+            p = _this$parentLinks$i$[0],
+            n = _this$parentLinks$i$[1],
+            s = _this$parentLinks$i$[2];
+
+        var mutName = (0,_utils__WEBPACK_IMPORTED_MODULE_1__.mutationName)(p, n, s);
+
+        if (!selectedMuts.includes(mutName)) {
+          return false;
+        }
+
+        ;
+        mutantNames.push(mutName);
+      }
+
+      ;
+      return startingMuts.every(function (mut) {
+        return mutantNames.includes(mut);
+      });
+    }
+  }, {
     key: "getMutName",
     value: function getMutName() {
       return this.parentLinks.map(function (_ref) {
@@ -562,19 +664,24 @@ var LandscapeNode = /*#__PURE__*/function () {
 
 ;
 
+var _defaultData = /*#__PURE__*/new WeakMap();
+
 var _defaultStartIndex = /*#__PURE__*/new WeakMap();
 
 var _defaultEndIndex = /*#__PURE__*/new WeakMap();
 
-var _defaultMaxRatioSum = /*#__PURE__*/new WeakMap();
-
-var _findStartEndIndex = /*#__PURE__*/new WeakSet();
+var _setStartEndIndex = /*#__PURE__*/new WeakSet();
 
 var LandscapeMap = /*#__PURE__*/function () {
   function LandscapeMap(data, startIndex, endIndex, maxRatioSum) {
     _classCallCheck(this, LandscapeMap);
 
-    _classPrivateMethodInitSpec(this, _findStartEndIndex);
+    _classPrivateMethodInitSpec(this, _setStartEndIndex);
+
+    _classPrivateFieldInitSpec(this, _defaultData, {
+      writable: true,
+      value: void 0
+    });
 
     _classPrivateFieldInitSpec(this, _defaultStartIndex, {
       writable: true,
@@ -586,20 +693,14 @@ var LandscapeMap = /*#__PURE__*/function () {
       value: void 0
     });
 
-    _classPrivateFieldInitSpec(this, _defaultMaxRatioSum, {
-      writable: true,
-      value: void 0
-    });
-
-    this.data = data;
+    _classPrivateFieldSet(this, _defaultData, data);
 
     _classPrivateFieldSet(this, _defaultStartIndex, startIndex);
 
     _classPrivateFieldSet(this, _defaultEndIndex, endIndex);
 
-    _classPrivateFieldSet(this, _defaultMaxRatioSum, maxRatioSum);
-
-    this.resetRenderPrep();
+    this.maxRatioSum = maxRatioSum;
+    this.resetMutSelection();
   }
 
   _createClass(LandscapeMap, [{
@@ -608,12 +709,9 @@ var LandscapeMap = /*#__PURE__*/function () {
       return [this.startIndex, this.endIndex];
     }
   }, {
-    key: "resetRenderPrep",
-    value: function resetRenderPrep() {
-      this.startIndex = _classPrivateFieldGet(this, _defaultStartIndex);
-      this.endIndex = _classPrivateFieldGet(this, _defaultEndIndex);
-      this.maxRatioSum = _classPrivateFieldGet(this, _defaultMaxRatioSum);
-      this.data.map(function (laneData) {
+    key: "resetDateRange",
+    value: function resetDateRange() {
+      this.data.forEach(function (laneData) {
         laneData.forEach(function (mutSetNode) {
           mutSetNode.resetDateRange();
         });
@@ -623,31 +721,41 @@ var LandscapeMap = /*#__PURE__*/function () {
   }, {
     key: "setDateRange",
     value: function setDateRange(dateRange) {
-      this.data.map(function (laneData) {
-        var laneRatioSum = 0;
+      this.data.forEach(function (laneData) {
         laneData.forEach(function (mutSetNode) {
           mutSetNode.setDateRange.apply(mutSetNode, _toConsumableArray(dateRange));
-          laneRatioSum += mutSetNode.ratioSum;
         });
       });
       return this;
     }
   }, {
-    key: "setMutationsAndDateRange",
-    value: function setMutationsAndDateRange(mutations, dateRange) {
-      var _this = this;
-
-      this.startIndex = null;
-      this.endIndex = null;
-      this.data.map(function (laneData, index) {
+    key: "resetMutSelection",
+    value: function resetMutSelection() {
+      this.startIndex = _classPrivateFieldGet(this, _defaultStartIndex);
+      this.endIndex = _classPrivateFieldGet(this, _defaultEndIndex);
+      this.data = _classPrivateFieldGet(this, _defaultData);
+      return this;
+    }
+  }, {
+    key: "setMutSelection",
+    value: function setMutSelection(startingMuts, selectedMuts) {
+      var laneTracker = new LaneInfoTracker();
+      this.data = _classPrivateFieldGet(this, _defaultData).map(function (laneData, laneIndex) {
+        var nodesToKeep = [];
         var laneRatioSum = 0;
         laneData.forEach(function (mutSetNode) {
-          mutSetNode.setDateRange.apply(mutSetNode, _toConsumableArray(dateRange));
-          laneRatioSum += mutSetNode.ratioSum;
-        });
+          if (mutSetNode.setMutSelection(startingMuts, selectedMuts)) {
+            nodesToKeep.push(mutSetNode);
+            laneRatioSum += mutSetNode.getDefaultRatioSum();
+          }
 
-        _classPrivateMethodGet(_this, _findStartEndIndex, _findStartEndIndex2).call(_this, laneRatioSum, index);
+          ;
+        });
+        laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
+        return nodesToKeep;
       });
+      this.startIndex = laneTracker.startIndex;
+      this.endIndex = laneTracker.endIndex;
       return this;
     }
   }]);
@@ -655,21 +763,51 @@ var LandscapeMap = /*#__PURE__*/function () {
   return LandscapeMap;
 }();
 
-function _findStartEndIndex2(laneRatioSum, index) {
+function _setStartEndIndex2(laneIndex, laneRatioSum) {
   if (laneRatioSum && this.startIndex === null) {
-    this.startIndex = index;
+    this.startIndex = laneIndex;
   }
 
   ;
 
   if (!laneRatioSum && this.startIndex !== null && this.endIndex === null) {
-    this.endIndex = index;
+    this.endIndex = laneIndex;
   }
 
   ;
 }
 
 ;
+
+var LaneInfoTracker = /*#__PURE__*/function () {
+  // This can be integrated into class LandscapeMap
+  function LaneInfoTracker() {
+    _classCallCheck(this, LaneInfoTracker);
+
+    this.startIndex = null;
+    this.endIndex = null;
+  }
+
+  _createClass(LaneInfoTracker, [{
+    key: "findStartEndIndex",
+    value: function findStartEndIndex(laneIndex, laneRatioSum) {
+      if (laneRatioSum && this.startIndex === null) {
+        this.startIndex = laneIndex;
+      }
+
+      ;
+
+      if (!laneRatioSum && this.startIndex !== null && this.endIndex === null) {
+        this.endIndex = laneIndex;
+      }
+
+      ;
+    }
+  }]);
+
+  return LaneInfoTracker;
+}();
+
 function parseData(mutantNode, mutantFreq) {
   var groupedMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.group)(mutantFreq, function (d) {
     return d["mut_set_id"];
@@ -679,27 +817,10 @@ function parseData(mutantNode, mutantFreq) {
   var laneData = [];
   var prevLaneData = new Map();
   var laneRatioSum = 0,
-      laneIndex = -1,
-      startIndex = null,
-      endIndex = null;
+      laneIndex = -1;
+  var laneTracker = new LaneInfoTracker();
   var prevMutLinkLength = -1;
   var maxRatioSum = -1;
-
-  function findStartEndIndex() {
-    if (laneRatioSum && startIndex === null) {
-      startIndex = laneIndex;
-    }
-
-    ;
-
-    if (!laneRatioSum && startIndex !== null && endIndex === null) {
-      endIndex = laneIndex;
-    }
-
-    ;
-    return [++laneIndex, startIndex, endIndex, 0];
-  }
-
   mutantNode.forEach(function (_ref3) {
     var _ref4 = _toArray(_ref3),
         mutSetId = _ref4[0],
@@ -731,16 +852,10 @@ function parseData(mutantNode, mutantFreq) {
 
     if (mutLink.length > prevMutLinkLength) {
       landscapeData.push(laneData);
-      laneData = []; // Decide start and end index based on laneRatioSum of each lane
-
-      var _findStartEndIndex3 = findStartEndIndex();
-
-      var _findStartEndIndex4 = _slicedToArray(_findStartEndIndex3, 4);
-
-      laneIndex = _findStartEndIndex4[0];
-      startIndex = _findStartEndIndex4[1];
-      endIndex = _findStartEndIndex4[2];
-      laneRatioSum = _findStartEndIndex4[3];
+      laneData = [];
+      laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
+      laneIndex++;
+      laneRatioSum = 0;
     }
 
     ;
@@ -762,15 +877,8 @@ function parseData(mutantNode, mutantFreq) {
   landscapeData.push(laneData);
   landscapeData.shift(); // Decide start and end index based on laneRatioSum of each lane
 
-  var _findStartEndIndex5 = findStartEndIndex();
-
-  var _findStartEndIndex6 = _slicedToArray(_findStartEndIndex5, 4);
-
-  laneIndex = _findStartEndIndex6[0];
-  startIndex = _findStartEndIndex6[1];
-  endIndex = _findStartEndIndex6[2];
-  laneRatioSum = _findStartEndIndex6[3];
-  var landscapeMap = new LandscapeMap(landscapeData, startIndex, endIndex, maxRatioSum);
+  laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
+  var landscapeMap = new LandscapeMap(landscapeData, laneTracker.startIndex, laneTracker.endIndex, maxRatioSum);
   var dailyMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.flatGroup)(mutFreq, function (d) {
     return d["mut"];
   }, function (d) {
@@ -874,10 +982,25 @@ __webpack_require__.r(__webpack_exports__);
 function mutationName(protein, pos, state) {
   return "".concat(protein, "_").concat(pos).concat(state);
 }
-function setMutOpacity(hoveredMut, mutName) {
-  var unhoveredOpacity = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.15;
-  var hoveredOpacity = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1;
-  return hoveredMut && mutName !== hoveredMut ? unhoveredOpacity : hoveredOpacity;
+function setMutOpacity(hoveredMut, mutName, selectedMuts, unhoveredOpacity, hoveredOpacity) {
+  var _unhoveredOpacity, _hoveredOpacity;
+
+  unhoveredOpacity = (_unhoveredOpacity = unhoveredOpacity) !== null && _unhoveredOpacity !== void 0 ? _unhoveredOpacity : 0.15;
+  hoveredOpacity = (_hoveredOpacity = hoveredOpacity) !== null && _hoveredOpacity !== void 0 ? _hoveredOpacity : 1;
+
+  if (hoveredMut) {
+    if (selectedMuts.length === 0 || selectedMuts.includes(hoveredMut)) {
+      return mutName === hoveredMut ? hoveredOpacity : unhoveredOpacity;
+    }
+
+    ;
+    return mutName === hoveredMut || selectedMuts.includes(mutName) ? hoveredOpacity : unhoveredOpacity;
+  } else if (selectedMuts.length === 0 || selectedMuts.includes(mutName)) {
+    return hoveredOpacity;
+  }
+
+  ;
+  return unhoveredOpacity;
 }
 
 /***/ }),
@@ -67872,10 +67995,15 @@ var App = function App() {
       hoveredMut = _useState6[0],
       setHoveredMut = _useState6[1];
 
-  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
+  var _useState7 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)([]),
       _useState8 = _slicedToArray(_useState7, 2),
-      brushExtent = _useState8[0],
-      setBrushExtent = _useState8[1];
+      selectedMuts = _useState8[0],
+      setSelectedMuts = _useState8[1];
+
+  var _useState9 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(null),
+      _useState10 = _slicedToArray(_useState9, 2),
+      brushExtent = _useState10[0],
+      setBrushExtent = _useState10[1];
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     var handleResize = function handleResize() {
@@ -67905,21 +68033,7 @@ var App = function App() {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("svg", {
     width: width,
     height: height
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components__WEBPACK_IMPORTED_MODULE_4__.DateGraph, {
-    mutDailyFreq: mutDailyFreq,
-    mutColorScale: mutColorScale,
-    dateRange: dateRange,
-    width: width * dateGraphSpecs.w,
-    height: height * dateGraphSpecs.h,
-    hoveredMut: hoveredMut,
-    setBrushExtent: setBrushExtent
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
-    transform: "translate(".concat(width - 100, ", 20)")
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components__WEBPACK_IMPORTED_MODULE_4__.ColorLegend, {
-    mutColorScale: mutColorScale,
-    hoveredMut: hoveredMut,
-    setHoveredMut: setHoveredMut
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
     transform: "translate(0, ".concat(height * dateGraphSpecs.h, ")")
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components__WEBPACK_IMPORTED_MODULE_4__.MutantMap, {
     landscapeMap: landscapeMap,
@@ -67927,7 +68041,25 @@ var App = function App() {
     width: width * landscapeSpecs.w,
     height: height * landscapeSpecs.h,
     hoveredMut: hoveredMut,
-    brushExtent: brushExtent
+    brushExtent: brushExtent,
+    selectedMuts: selectedMuts
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components__WEBPACK_IMPORTED_MODULE_4__.DateGraph, {
+    mutDailyFreq: mutDailyFreq,
+    mutColorScale: mutColorScale,
+    dateRange: dateRange,
+    width: width * dateGraphSpecs.w,
+    height: height * dateGraphSpecs.h,
+    hoveredMut: hoveredMut,
+    setBrushExtent: setBrushExtent,
+    selectedMuts: selectedMuts
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
+    transform: "translate(".concat(width - 100, ", 20)")
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement(_components__WEBPACK_IMPORTED_MODULE_4__.ColorLegend, {
+    mutColorScale: mutColorScale,
+    hoveredMut: hoveredMut,
+    setHoveredMut: setHoveredMut,
+    selectedMuts: selectedMuts,
+    setSelectedMuts: setSelectedMuts
   })));
 };
 

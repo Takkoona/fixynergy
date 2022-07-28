@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { scaleLinear, scaleSqrt, max, pie, arc } from "d3";
 import { mutationName, setMutOpacity } from "../utils";
 
 const margin = { top: 40, right: 200, bottom: 40, left: 40 }
-const maxNodeSize = 100;
+const defaultMaxNodeSize = 100;
+const nodeChangeSize = 20;
 
 export function MutantMap({
     landscapeMap,
@@ -15,6 +16,33 @@ export function MutantMap({
     selectedMuts
 }) {
 
+    const [maxNodeSize, setMaxNodeSize] = useState(defaultMaxNodeSize);
+    const mutatnMapRef = useRef(null);
+
+    useEffect(() => {
+        const handler = event => {
+            // event.preventDefault();
+            if (event.deltaY < 0) {
+                setMaxNodeSize(prevMaxNodeSize => prevMaxNodeSize + nodeChangeSize);
+            }
+            if (event.deltaY > 0) {
+                setMaxNodeSize(prevMaxNodeSize => prevMaxNodeSize - nodeChangeSize);
+            };
+            if (event.ctrlKey) {
+                if (event.key === "0") {
+                    setMaxNodeSize(defaultMaxNodeSize);
+                }
+            }
+        };
+        const element = mutatnMapRef.current;
+        element.addEventListener("wheel", handler);
+        document.addEventListener('keydown', handler);
+        return () => {
+            element.removeEventListener("wheel", handler);
+            document.removeEventListener('keydown', handler);
+        }
+    }, []);
+    // console.log(maxNodeSize);
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
@@ -28,12 +56,14 @@ export function MutantMap({
     } else {
         landscapeMap.resetMutSelection();
     };
+
     const [startIndex, endIndex] = landscapeMap.getStartEndIndex();
     const xScale = scaleLinear().domain([startIndex, endIndex - 1]).range([0, innerWidth]);
     const nodeSizeScale = scaleSqrt().domain([0, landscapeMap.maxRatioSum]).range([0, maxNodeSize]);
 
     return (
-        <g transform={`translate(${margin.left}, ${margin.top})`}>
+        <g transform={`translate(${margin.left}, ${margin.top})`} ref={mutatnMapRef}>
+            <rect width={innerWidth} height={innerHeight} fill="white"></rect>
             {landscapeMap.data.map((laneData, laneIndex) => {
                 const yScale = scaleLinear().domain([0, laneData.length + 1]).range([innerHeight, 0]);
                 return (
@@ -127,7 +157,7 @@ function MutantLane({
                                     selectedMuts
                                 )}
                             >
-                                <title>{data["mutName"]}</title>
+                                <title>{`${data["mutName"]} (${mutSetNode.getMutName()})`}</title>
                             </path>
                         )
                     })}

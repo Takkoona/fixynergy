@@ -17,11 +17,11 @@ const App = () => {
     const [selectedMuts, setSelectedMuts] = useState([]);
     const [brushExtent, setBrushExtent] = useState(null);
 
-    const handleResize = () => {
-        setWidth(root.offsetWidth);
-        setHeight(root.offsetHeight);
-    };
     useEffect(() => {
+        const handleResize = () => {
+            setWidth(root.offsetWidth);
+            setHeight(root.offsetHeight);
+        };
         window.addEventListener("resize", handleResize);
         return () => {
             window.removeEventListener("resize", handleResize);
@@ -36,14 +36,16 @@ const App = () => {
 
     return (
         <svg width={width} height={height}>
-            <g transform={`translate(${width - 100}, 20)`}>
-                <ColorLegend
+            <g transform={`translate(0, ${height * dateGraphSpecs.h})`}>
+                <MutantMap
+                    landscapeMap={landscapeMap}
                     mutColorScale={mutColorScale}
+                    width={width * landscapeSpecs.w}
+                    height={height * landscapeSpecs.h}
                     hoveredMut={hoveredMut}
-                    setHoveredMut={setHoveredMut}
+                    brushExtent={brushExtent}
                     selectedMuts={selectedMuts}
-                    setSelectedMuts={setSelectedMuts}
-                ></ColorLegend>
+                ></MutantMap>
             </g>
             <DateGraph
                 mutDailyFreq={mutDailyFreq}
@@ -55,16 +57,14 @@ const App = () => {
                 setBrushExtent={setBrushExtent}
                 selectedMuts={selectedMuts}
             ></DateGraph>
-            <g transform={`translate(0, ${height * dateGraphSpecs.h})`}>
-                <MutantMap
-                    landscapeMap={landscapeMap}
+            <g transform={`translate(${width - 100}, 20)`}>
+                <ColorLegend
                     mutColorScale={mutColorScale}
-                    width={width * landscapeSpecs.w}
-                    height={height * landscapeSpecs.h}
                     hoveredMut={hoveredMut}
-                    brushExtent={brushExtent}
+                    setHoveredMut={setHoveredMut}
                     selectedMuts={selectedMuts}
-                ></MutantMap>
+                    setSelectedMuts={setSelectedMuts}
+                ></ColorLegend>
             </g>
         </svg>
     );
