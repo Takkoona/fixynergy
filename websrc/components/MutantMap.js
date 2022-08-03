@@ -42,7 +42,7 @@ export function MutantMap({
             document.removeEventListener('keydown', handler);
         }
     }, []);
-    // console.log(maxNodeSize);
+
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 

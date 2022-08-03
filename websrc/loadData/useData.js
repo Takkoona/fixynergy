@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { json, csv } from "d3";
-import { parseData } from "./processData";
+import { LandscapeMap } from "./processData";
 
 const rawDataUrl = "https://gist.githubusercontent.com/Takkoona/854b54ed3148561f95e395350d16ff45/raw/4ad38d75214136e74b4b7bb7f614b42f25a27364";
 
@@ -21,7 +21,9 @@ export function useData() {
                 return d;
             })
         ]).then(([mutantNode, mutantFreq]) => {
-            setData(parseData(mutantNode, mutantFreq));
+            const landscapeMap = new LandscapeMap();
+            const [mutDailyFreq, dateRange] = landscapeMap.fromDailyData(mutantNode, mutantFreq);
+            setData([landscapeMap, mutDailyFreq, dateRange]);
         })
     }, [mutNodeUrl, mutFreqUrl]);
 
