@@ -5,3 +5,6 @@ dependencies:
   - conda-forge::ipykernel
   - conda-forge::notebook
   - conda-forge::nbconvert
+  - pip
+  - pip:
+    - ncbi-datasets-pylib

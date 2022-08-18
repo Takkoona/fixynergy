@@ -283,7 +283,9 @@ var margin = {
   left: 40
 };
 var defaultMaxNodeSize = 100;
+var defaultCapNodeSize = 100;
 var nodeChangeSize = 20;
+var capChangeSize = 10;
 function MutantMap(_ref) {
   var landscapeMap = _ref.landscapeMap,
       mutColorScale = _ref.mutColorScale,
@@ -298,28 +300,37 @@ function MutantMap(_ref) {
       maxNodeSize = _useState2[0],
       setMaxNodeSize = _useState2[1];
 
+  var _useState3 = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(defaultCapNodeSize),
+      _useState4 = _slicedToArray(_useState3, 2),
+      capNodeSize = _useState4[0],
+      setCapNodeSize = _useState4[1];
+
   var mutatnMapRef = (0,react__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(function () {
     var handler = function handler(event) {
-      // event.preventDefault();
+      event.preventDefault();
+
       if (event.deltaY < 0) {
-        setMaxNodeSize(function (prevMaxNodeSize) {
+        event.ctrlKey ? setCapNodeSize(function (prevCapNodeSize) {
+          return prevCapNodeSize + capChangeSize;
+        }) : setMaxNodeSize(function (prevMaxNodeSize) {
           return prevMaxNodeSize + nodeChangeSize;
         });
       }
 
       if (event.deltaY > 0) {
-        setMaxNodeSize(function (prevMaxNodeSize) {
+        event.ctrlKey ? setCapNodeSize(function (prevCapNodeSize) {
+          return prevCapNodeSize - capChangeSize;
+        }) : setMaxNodeSize(function (prevMaxNodeSize) {
           return prevMaxNodeSize - nodeChangeSize;
         });
       }
 
       ;
 
-      if (event.ctrlKey) {
-        if (event.key === "0") {
-          setMaxNodeSize(defaultMaxNodeSize);
-        }
+      if (event.ctrlKey && event.key === "0") {
+        setMaxNodeSize(defaultMaxNodeSize);
+        setCapNodeSize(defaultCapNodeSize);
       }
     };
 
@@ -330,26 +341,11 @@ function MutantMap(_ref) {
       element.removeEventListener("wheel", handler);
       document.removeEventListener('keydown', handler);
     };
-  }, []); // console.log(maxNodeSize);
-
+  }, []);
   var innerWidth = width - margin.left - margin.right;
   var innerHeight = height - margin.top - margin.bottom;
-
-  if (brushExtent) {
-    landscapeMap.setDateRange(brushExtent);
-  } else {
-    landscapeMap.resetDateRange();
-  }
-
-  ;
-
-  if (selectedMuts.length) {
-    landscapeMap.setMutSelection([], selectedMuts);
-  } else {
-    landscapeMap.resetMutSelection();
-  }
-
-  ;
+  brushExtent ? landscapeMap.setDateRange(brushExtent) : landscapeMap.resetDateRange();
+  selectedMuts.length ? landscapeMap.setMutSelection([], selectedMuts) : landscapeMap.resetMutSelection();
 
   var _landscapeMap$getStar = landscapeMap.getStartEndIndex(),
       _landscapeMap$getStar2 = _slicedToArray(_landscapeMap$getStar, 2),
@@ -374,6 +370,8 @@ function MutantMap(_ref) {
       xScale: xScale,
       yScale: yScale,
       nodeSizeScale: nodeSizeScale,
+      maxNodeSize: maxNodeSize,
+      capNodeSize: capNodeSize,
       hoveredMut: hoveredMut,
       selectedMuts: selectedMuts
     });
@@ -387,6 +385,8 @@ function MutantLane(_ref2) {
       xScale = _ref2.xScale,
       yScale = _ref2.yScale,
       nodeSizeScale = _ref2.nodeSizeScale,
+      maxNodeSize = _ref2.maxNodeSize,
+      capNodeSize = _ref2.capNodeSize,
       hoveredMut = _ref2.hoveredMut,
       selectedMuts = _ref2.selectedMuts;
   return laneData.map(function (mutSetNode, nodeIndex) {
@@ -401,7 +401,8 @@ function MutantLane(_ref2) {
     ;
     var mutSetId = mutSetNode.id;
     var mutIncreValues = [];
-    var pieRadius = nodeSizeScale(mutSetNode.ratioSum);
+    var rawPieRadius = nodeSizeScale(mutSetNode.ratioSum);
+    var pieRadius = rawPieRadius > capNodeSize ? capNodeSize : rawPieRadius;
     var arcScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.arc)().innerRadius(0).outerRadius(pieRadius);
     var pieScale = (0,d3__WEBPACK_IMPORTED_MODULE_1__.pie)().value(function (d) {
       return d["ratioDiff"];
@@ -426,7 +427,7 @@ function MutantLane(_ref2) {
         x2: x,
         y2: y,
         strokeWidth: "1",
-        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, selectedMuts, 0, (0,d3__WEBPACK_IMPORTED_MODULE_1__.max)([ratioDiff, 0])),
+        opacity: (0,_utils__WEBPACK_IMPORTED_MODULE_2__.setMutOpacity)(hoveredMut, mutName, selectedMuts, 0, (0,d3__WEBPACK_IMPORTED_MODULE_1__.max)([ratioDiff, 0])) * (maxNodeSize / defaultMaxNodeSize),
         stroke: mutColorScale(mutName)
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("title", null, "Mutation: ".concat(mutName)));
     }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0___default().createElement("g", {
@@ -506,21 +507,23 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "parseData": () => (/* binding */ parseData)
+/* harmony export */   "LandscapeMap": () => (/* binding */ LandscapeMap)
 /* harmony export */ });
 /* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "./node_modules/d3/src/index.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./websrc/utils/index.js");
-function _toArray(arr) { return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest(); }
-
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
+function _toArray(arr) { return _arrayWithHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableRest(); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
 function _classPrivateMethodInitSpec(obj, privateSet) { _checkPrivateRedeclaration(obj, privateSet); privateSet.add(obj); }
+
+function _classPrivateMethodGet(receiver, privateSet, fn) { if (!privateSet.has(receiver)) { throw new TypeError("attempted to get private field on non-instance"); } return fn; }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 
@@ -673,7 +676,7 @@ var _defaultEndIndex = /*#__PURE__*/new WeakMap();
 var _setStartEndIndex = /*#__PURE__*/new WeakSet();
 
 var LandscapeMap = /*#__PURE__*/function () {
-  function LandscapeMap(data, startIndex, endIndex, maxRatioSum) {
+  function LandscapeMap() {
     _classCallCheck(this, LandscapeMap);
 
     _classPrivateMethodInitSpec(this, _setStartEndIndex);
@@ -693,17 +696,120 @@ var LandscapeMap = /*#__PURE__*/function () {
       value: void 0
     });
 
-    _classPrivateFieldSet(this, _defaultData, data);
-
-    _classPrivateFieldSet(this, _defaultStartIndex, startIndex);
-
-    _classPrivateFieldSet(this, _defaultEndIndex, endIndex);
-
-    this.maxRatioSum = maxRatioSum;
-    this.resetMutSelection();
+    this.data = [];
+    this.startIndex = null;
+    this.endIndex = null;
+    this.maxRatioSum = -1;
   }
 
   _createClass(LandscapeMap, [{
+    key: "fromDailyData",
+    value: function fromDailyData(mutantNode, mutantFreq) {
+      var _this = this;
+
+      var groupedMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.group)(mutantFreq, function (d) {
+        return d["mut_set_id"];
+      });
+      var mutFreq = [];
+      var laneData = [];
+      var prevLaneData = new Map();
+      var laneRatioSum = 0,
+          laneIndex = -1;
+      var prevMutLinkLength = -1;
+      mutantNode.forEach(function (_ref3) {
+        var _ref4 = _toArray(_ref3),
+            mutSetId = _ref4[0],
+            mutLink = _ref4.slice(1);
+
+        var dailyRatio = groupedMutFreq.get(mutSetId) || [];
+        var parentLinks = [];
+
+        for (var i = 0; i < mutLink.length; i += MUT_INFO_LEN) {
+          var _mutLink$slice = mutLink.slice(i, i + MUT_INFO_LEN),
+              _mutLink$slice2 = _toArray(_mutLink$slice),
+              parentId = _mutLink$slice2[0],
+              mut = _mutLink$slice2.slice(1);
+
+          parentLinks.push([prevLaneData.get(parentId), mut]);
+
+          for (var j = 0; j < dailyRatio.length; j++) {
+            mutFreq.push({
+              "mut": _utils__WEBPACK_IMPORTED_MODULE_1__.mutationName.apply(void 0, _toConsumableArray(mut)),
+              "date": dailyRatio[j]["date"],
+              "ratio": dailyRatio[j]["ratio"]
+            });
+          }
+
+          ;
+        }
+
+        ;
+
+        if (mutLink.length > prevMutLinkLength) {
+          _this.data.push(laneData);
+
+          laneData = [];
+
+          _classPrivateMethodGet(_this, _setStartEndIndex, _setStartEndIndex2).call(_this, laneIndex, laneRatioSum);
+
+          laneIndex++;
+          laneRatioSum = 0;
+        }
+
+        ;
+        var ratioSum = (0,d3__WEBPACK_IMPORTED_MODULE_0__.sum)(dailyRatio, function (d) {
+          return d["ratio"];
+        });
+        laneRatioSum += ratioSum;
+
+        if (ratioSum > _this.maxRatioSum) {
+          _this.maxRatioSum = ratioSum;
+        }
+
+        ;
+        var mutSetNode = new LandscapeNode(mutSetId, parentLinks, dailyRatio, ratioSum);
+        prevLaneData.set(mutSetId, mutSetNode);
+        laneData.push(mutSetNode);
+        prevMutLinkLength = mutLink.length;
+      });
+      this.data.push(laneData);
+      this.data.shift(); // Decide start and end index based on laneRatioSum of each lane
+
+      _classPrivateMethodGet(this, _setStartEndIndex, _setStartEndIndex2).call(this, laneIndex, laneRatioSum);
+
+      _classPrivateFieldSet(this, _defaultData, this.data);
+
+      _classPrivateFieldSet(this, _defaultStartIndex, this.startIndex);
+
+      _classPrivateFieldSet(this, _defaultEndIndex, this.endIndex);
+
+      var dailyMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.flatGroup)(mutFreq, function (d) {
+        return d["mut"];
+      }, function (d) {
+        return d["date"];
+      }).map(function (_ref5) {
+        var _ref6 = _slicedToArray(_ref5, 3),
+            n = _ref6[0],
+            d = _ref6[1],
+            ratio = _ref6[2];
+
+        return {
+          "mut": n,
+          "date": d,
+          "ratio": (0,d3__WEBPACK_IMPORTED_MODULE_0__.sum)(ratio, function (r) {
+            return r["ratio"];
+          })
+        };
+      });
+      var dateRange = (0,d3__WEBPACK_IMPORTED_MODULE_0__.extent)(dailyMutFreq, function (d) {
+        return d["date"];
+      });
+      var mutDailyFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.group)(dailyMutFreq, function (d) {
+        return d["mut"];
+      });
+      return [mutDailyFreq, dateRange];
+    }
+  }, {
     key: "getStartEndIndex",
     value: function getStartEndIndex() {
       return [this.startIndex, this.endIndex];
@@ -739,7 +845,9 @@ var LandscapeMap = /*#__PURE__*/function () {
   }, {
     key: "setMutSelection",
     value: function setMutSelection(startingMuts, selectedMuts) {
-      var laneTracker = new LaneInfoTracker();
+      var _this2 = this;
+
+      this.startIndex = null, this.endIndex = null;
       this.data = _classPrivateFieldGet(this, _defaultData).map(function (laneData, laneIndex) {
         var nodesToKeep = [];
         var laneRatioSum = 0;
@@ -751,11 +859,11 @@ var LandscapeMap = /*#__PURE__*/function () {
 
           ;
         });
-        laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
+
+        _classPrivateMethodGet(_this2, _setStartEndIndex, _setStartEndIndex2).call(_this2, laneIndex, laneRatioSum);
+
         return nodesToKeep;
       });
-      this.startIndex = laneTracker.startIndex;
-      this.endIndex = laneTracker.endIndex;
       return this;
     }
   }]);
@@ -777,134 +885,6 @@ function _setStartEndIndex2(laneIndex, laneRatioSum) {
   ;
 }
 
-;
-
-var LaneInfoTracker = /*#__PURE__*/function () {
-  // This can be integrated into class LandscapeMap
-  function LaneInfoTracker() {
-    _classCallCheck(this, LaneInfoTracker);
-
-    this.startIndex = null;
-    this.endIndex = null;
-  }
-
-  _createClass(LaneInfoTracker, [{
-    key: "findStartEndIndex",
-    value: function findStartEndIndex(laneIndex, laneRatioSum) {
-      if (laneRatioSum && this.startIndex === null) {
-        this.startIndex = laneIndex;
-      }
-
-      ;
-
-      if (!laneRatioSum && this.startIndex !== null && this.endIndex === null) {
-        this.endIndex = laneIndex;
-      }
-
-      ;
-    }
-  }]);
-
-  return LaneInfoTracker;
-}();
-
-function parseData(mutantNode, mutantFreq) {
-  var groupedMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.group)(mutantFreq, function (d) {
-    return d["mut_set_id"];
-  });
-  var mutFreq = [];
-  var landscapeData = [];
-  var laneData = [];
-  var prevLaneData = new Map();
-  var laneRatioSum = 0,
-      laneIndex = -1;
-  var laneTracker = new LaneInfoTracker();
-  var prevMutLinkLength = -1;
-  var maxRatioSum = -1;
-  mutantNode.forEach(function (_ref3) {
-    var _ref4 = _toArray(_ref3),
-        mutSetId = _ref4[0],
-        mutLink = _ref4.slice(1);
-
-    var dailyRatio = groupedMutFreq.get(mutSetId) || [];
-    var parentLinks = [];
-
-    for (var i = 0; i < mutLink.length; i += MUT_INFO_LEN) {
-      var _mutLink$slice = mutLink.slice(i, i + MUT_INFO_LEN),
-          _mutLink$slice2 = _toArray(_mutLink$slice),
-          parentId = _mutLink$slice2[0],
-          mut = _mutLink$slice2.slice(1);
-
-      parentLinks.push([prevLaneData.get(parentId), mut]);
-
-      for (var j = 0; j < dailyRatio.length; j++) {
-        mutFreq.push({
-          "mut": _utils__WEBPACK_IMPORTED_MODULE_1__.mutationName.apply(void 0, _toConsumableArray(mut)),
-          "date": dailyRatio[j]["date"],
-          "ratio": dailyRatio[j]["ratio"]
-        });
-      }
-
-      ;
-    }
-
-    ;
-
-    if (mutLink.length > prevMutLinkLength) {
-      landscapeData.push(laneData);
-      laneData = [];
-      laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
-      laneIndex++;
-      laneRatioSum = 0;
-    }
-
-    ;
-    var ratioSum = (0,d3__WEBPACK_IMPORTED_MODULE_0__.sum)(dailyRatio, function (d) {
-      return d["ratio"];
-    });
-    laneRatioSum += ratioSum;
-
-    if (ratioSum > maxRatioSum) {
-      maxRatioSum = ratioSum;
-    }
-
-    ;
-    var mutSetNode = new LandscapeNode(mutSetId, parentLinks, dailyRatio, ratioSum);
-    prevLaneData.set(mutSetId, mutSetNode);
-    laneData.push(mutSetNode);
-    prevMutLinkLength = mutLink.length;
-  });
-  landscapeData.push(laneData);
-  landscapeData.shift(); // Decide start and end index based on laneRatioSum of each lane
-
-  laneTracker.findStartEndIndex(laneIndex, laneRatioSum);
-  var landscapeMap = new LandscapeMap(landscapeData, laneTracker.startIndex, laneTracker.endIndex, maxRatioSum);
-  var dailyMutFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.flatGroup)(mutFreq, function (d) {
-    return d["mut"];
-  }, function (d) {
-    return d["date"];
-  }).map(function (_ref5) {
-    var _ref6 = _slicedToArray(_ref5, 3),
-        n = _ref6[0],
-        d = _ref6[1],
-        ratio = _ref6[2];
-
-    return {
-      "mut": n,
-      "date": d,
-      "ratio": (0,d3__WEBPACK_IMPORTED_MODULE_0__.sum)(ratio, function (r) {
-        return r["ratio"];
-      })
-    };
-  });
-  var dateRange = (0,d3__WEBPACK_IMPORTED_MODULE_0__.extent)(dailyMutFreq, function (d) {
-    return d["date"];
-  });
-  var mutDailyFreq = (0,d3__WEBPACK_IMPORTED_MODULE_0__.group)(dailyMutFreq, function (d) {
-    return d["mut"];
-  });
-  return [landscapeMap, mutDailyFreq, dateRange];
-}
 ;
 
 /***/ }),
@@ -959,7 +939,14 @@ function useData() {
           mutantNode = _ref2[0],
           mutantFreq = _ref2[1];
 
-      setData((0,_processData__WEBPACK_IMPORTED_MODULE_2__.parseData)(mutantNode, mutantFreq));
+      var landscapeMap = new _processData__WEBPACK_IMPORTED_MODULE_2__.LandscapeMap();
+
+      var _landscapeMap$fromDai = landscapeMap.fromDailyData(mutantNode, mutantFreq),
+          _landscapeMap$fromDai2 = _slicedToArray(_landscapeMap$fromDai, 2),
+          mutDailyFreq = _landscapeMap$fromDai2[0],
+          dateRange = _landscapeMap$fromDai2[1];
+
+      setData([landscapeMap, mutDailyFreq, dateRange]);
     });
   }, [mutNodeUrl, mutFreqUrl]);
   return data;

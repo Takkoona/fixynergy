@@ -4,7 +4,9 @@ import { mutationName, setMutOpacity } from "../utils";
 
 const margin = { top: 40, right: 200, bottom: 40, left: 40 }
 const defaultMaxNodeSize = 100;
+const defaultCapNodeSize = 100;
 const nodeChangeSize = 20;
+const capChangeSize = 10;
 
 export function MutantMap({
     landscapeMap,
@@ -17,21 +19,25 @@ export function MutantMap({
 }) {
 
     const [maxNodeSize, setMaxNodeSize] = useState(defaultMaxNodeSize);
+    const [capNodeSize, setCapNodeSize] = useState(defaultCapNodeSize);
     const mutatnMapRef = useRef(null);
 
     useEffect(() => {
         const handler = event => {
-            // event.preventDefault();
+            event.preventDefault();
             if (event.deltaY < 0) {
-                setMaxNodeSize(prevMaxNodeSize => prevMaxNodeSize + nodeChangeSize);
+                event.ctrlKey ?
+                    setCapNodeSize(prevCapNodeSize => prevCapNodeSize + capChangeSize) :
+                    setMaxNodeSize(prevMaxNodeSize => prevMaxNodeSize + nodeChangeSize);
             }
             if (event.deltaY > 0) {
-                setMaxNodeSize(prevMaxNodeSize => prevMaxNodeSize - nodeChangeSize);
+                event.ctrlKey ?
+                    setCapNodeSize(prevCapNodeSize => prevCapNodeSize - capChangeSize) :
+                    setMaxNodeSize(prevMaxNodeSize => prevMaxNodeSize - nodeChangeSize);
             };
-            if (event.ctrlKey) {
-                if (event.key === "0") {
-                    setMaxNodeSize(defaultMaxNodeSize);
-                }
+            if (event.ctrlKey && event.key === "0") {
+                setMaxNodeSize(defaultMaxNodeSize);
+                setCapNodeSize(defaultCapNodeSize);
             }
         };
         const element = mutatnMapRef.current;
@@ -46,16 +52,13 @@ export function MutantMap({
     const innerWidth = width - margin.left - margin.right;
     const innerHeight = height - margin.top - margin.bottom;
 
-    if (brushExtent) {
-        landscapeMap.setDateRange(brushExtent);
-    } else {
+    brushExtent ?
+        landscapeMap.setDateRange(brushExtent) :
         landscapeMap.resetDateRange();
-    };
-    if (selectedMuts.length) {
-        landscapeMap.setMutSelection([], selectedMuts);
-    } else {
+
+    selectedMuts.length ?
+        landscapeMap.setMutSelection([], selectedMuts) :
         landscapeMap.resetMutSelection();
-    };
 
     const [startIndex, endIndex] = landscapeMap.getStartEndIndex();
     const xScale = scaleLinear().domain([startIndex, endIndex - 1]).range([0, innerWidth]);
@@ -74,6 +77,8 @@ export function MutantMap({
                         xScale={xScale}
                         yScale={yScale}
                         nodeSizeScale={nodeSizeScale}
+                        maxNodeSize={maxNodeSize}
+                        capNodeSize={capNodeSize}
                         hoveredMut={hoveredMut}
                         selectedMuts={selectedMuts}
                     ></MutantLane>
@@ -89,6 +94,8 @@ function MutantLane({
     xScale,
     yScale,
     nodeSizeScale,
+    maxNodeSize,
+    capNodeSize,
     hoveredMut,
     selectedMuts
 }) {
@@ -99,7 +106,8 @@ function MutantLane({
         if (mutSetNode.ratioSum === 0) { return undefined; };
         const mutSetId = mutSetNode.id;
         const mutIncreValues = [];
-        const pieRadius = nodeSizeScale(mutSetNode.ratioSum);
+        const rawPieRadius = nodeSizeScale(mutSetNode.ratioSum);
+        const pieRadius = rawPieRadius > capNodeSize ? capNodeSize : rawPieRadius;
         const arcScale = arc().innerRadius(0).outerRadius(pieRadius);
         const pieScale = pie().value(d => d["ratioDiff"]);
         return (
@@ -122,7 +130,7 @@ function MutantLane({
                                 selectedMuts,
                                 0,
                                 max([ratioDiff, 0])
-                            )}
+                            ) * (maxNodeSize / defaultMaxNodeSize)}
                             stroke={mutColorScale(mutName)}
                         >
                             <title>{`Mutation: ${mutName}`}</title>
